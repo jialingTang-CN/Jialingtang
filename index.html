@@ -125,7 +125,7 @@
 
             padding: 20px;
         }
-        #p5-container {
+      #p5-container {
       position: fixed;
       top: 20px;
       left: 20px;
@@ -447,7 +447,7 @@
                 li.innerHTML = `
                     <input type="checkbox" ${task.completed ? 'checked' : ''}>
                     <span class="task-text">${task.text}</span> 
-                    <button class="delete-btn">鉁�</button>
+                    <button class="delete-btn">del</button>
                 `;
                 taskList.appendChild(li); 
 
@@ -508,8 +508,7 @@ function setup() {
   textFont("Helvetica");
   textSize(fontSize);
 }
-        background(0, 0);
-        }
+  background(0, 0);
  
 function pointForIndex(pct) {
   const NOISE_SCALE = 1.5;
@@ -646,6 +645,7 @@ function draw() {
     </script>
 </body>
 </html>
+
 
 
 
