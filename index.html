@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>纯JS精美TodoList</title>
+    <title>绾疛S绮剧編TodoList</title>
     <style>
         * {
             margin: 0;
             padding: 0;
+            overflow: hidden;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
@@ -17,7 +18,108 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            background: 
+
+                /* 宸︿笂瑙掓槑鏄炬笎鍙� */
+
+                radial-gradient(circle at 15% 15%, 
+
+                    rgba(200, 230, 255, 0.9) 0%, 
+
+                    rgba(200, 230, 255, 0.6) 30%,
+
+                    transparent 60%),
+
+                
+
+                /* 鍙充笅瑙掓槑鏄炬笎鍙� */
+
+                radial-gradient(ellipse at 85% 85%, 
+
+                    rgba(240, 248, 255, 1) 0%, 
+
+                    rgba(224, 240, 255, 0.7) 40%,
+
+                    transparent 70%),
+
+                
+
+                /* 涓棿鍙充晶杈呭姪娓愬彉 */
+
+                radial-gradient(circle at 70% 50%, 
+
+                    rgba(220, 240, 255, 0.8) 0%,
+
+                    transparent 50%),
+
+                
+
+                /* 鍩哄簳娓愬彉 */
+
+                linear-gradient(145deg, 
+
+                    #e1f0ff 0%, 
+
+                    #f0f8ff 100%);
+
+            
+
+            /* 鍏煎鎬у鐞� */
+
+            background: 
+
+                -webkit-radial-gradient(15% 15%, circle, 
+
+                    rgba(200, 230, 255, 0.9) 0%, 
+
+                    rgba(200, 230, 255, 0.6) 30%,
+
+                    transparent 60%),
+
+                -webkit-radial-gradient(85% 85%, ellipse, 
+
+                    rgba(240, 248, 255, 1) 0%, 
+
+                    rgba(224, 240, 255, 0.7) 40%,
+
+                    transparent 70%),
+
+                -webkit-radial-gradient(70% 50%, circle, 
+
+                    rgba(220, 240, 255, 0.8) 0%,
+
+                    transparent 50%),
+
+                -webkit-linear-gradient(145deg, #e1f0ff 0%, #f0f8ff 100%);
+
+                
+
+            background: 
+
+                -moz-radial-gradient(15% 15%, circle, 
+
+                    rgba(200, 230, 255, 0.9) 0%, 
+
+                    rgba(200, 230, 255, 0.6) 30%,
+
+                    transparent 60%),
+
+                -moz-radial-gradient(85% 85%, ellipse, 
+
+                    rgba(240, 248, 255, 1) 0%, 
+
+                    rgba(224, 240, 255, 0.7) 40%,
+
+                    transparent 70%),
+
+                -moz-radial-gradient(70% 50%, circle, 
+
+                    rgba(220, 240, 255, 0.8) 0%,
+
+                    transparent 50%),
+
+                -moz-linear-gradient(145deg, #e1f0ff 0%, #f0f8ff 100%);
+
             padding: 20px;
         }
  
@@ -200,6 +302,28 @@
 
 
 
+        .guide {
+
+            position: absolute;
+
+            font-family: Arial, sans-serif;
+
+            color: #5a7a8a;
+
+            padding: 10px;
+
+            background: rgba(255,255,255,0.7);
+
+            border-radius: 5px;
+
+        }
+
+        .guide-1 { top: 15%; left: 15%; }
+
+        .guide-2 { bottom: 15%; right: 15%; }
+
+
+
         @keyframes fadeIn {
 
             from {
@@ -217,6 +341,31 @@
     </style>
 </head>
 <body>
+    <div id="realtime-clock" style="
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(0,0,0,0.7);
+  padding: 10px 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+">
+  <span id="current-time">00:00:00</span>
+</div>
+    <div class="guide guide-1">娓愬彉鍖哄煙1</div>
+    <div class="guide guide-2">娓愬彉鍖哄煙2</div>
+
+    <button type="button"
+onclick="document.getElementById('demo').innerHTML = Date()">
+time.</button>
+
+<p id="demo"></p>
     <div class="todo-app">
         <h1>Todo List</h1>
         <div class="input-area">
@@ -227,18 +376,18 @@
     </div>
 
     <script>
-        // 任务数组初始化（从localStorage加载）
+        // 浠诲姟鏁扮粍鍒濆鍖栵紙浠巐ocalStorage鍔犺浇锛�
         let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
-        // DOM元素
+        // DOM鍏冪礌
         const taskInput = document.getElementById('new-task'); 
         const addButton = document.getElementById('add-btn'); 
         const taskList = document.getElementById('task-list'); 
 
-        // 初始化渲染
+        // 鍒濆鍖栨覆鏌�
         renderTasks();
 
-        // 添加任务
+        // 娣诲姞浠诲姟
         addButton.addEventListener('click', addTask);
         taskInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
@@ -257,7 +406,7 @@
             }
         }
 
-        // 渲染任务列表（带动画）
+        // 娓叉煋浠诲姟鍒楄〃锛堝甫鍔ㄧ敾锛�
         function renderTasks() {
             taskList.innerHTML = '';
             tasks.forEach((task, index) => {
@@ -269,11 +418,11 @@
                 li.innerHTML = `
                     <input type="checkbox" ${task.completed ? 'checked' : ''}>
                     <span class="task-text">${task.text}</span> 
-                    <button class="delete-btn">✕</button>
+                    <button class="delete-btn">鉁�</button>
                 `;
                 taskList.appendChild(li); 
 
-                // 事件绑定：删除任务
+                // 浜嬩欢缁戝畾锛氬垹闄や换鍔�
                 li.querySelector('.delete-btn').addEventListener('click', () => {
                     li.classList.add('fade-out'); 
                     setTimeout(() => {
@@ -283,7 +432,7 @@
                     }, 300);
                 });
 
-                // 事件绑定：切换任务状态
+                // 浜嬩欢缁戝畾锛氬垏鎹换鍔＄姸鎬�
                 li.querySelector('input').addEventListener('change', () => {
                     task.completed = !task.completed; 
                     li.classList.toggle('completed', task.completed); 
@@ -292,11 +441,30 @@
             });
         }
 
-        // 保存到localStorage
+        function updateClock() {
+            const now = new Date();
+            // 鍙彁鍙栨椂鍒嗙骞舵牸寮忓寲涓轰袱浣嶆暟
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            // 鏇存柊鏄剧ず
+            document.getElementById('current-time').textContent = 
+            `${hours}:${minutes}:${seconds}`;
+        }
+
+        // 鍒濆鍔犺浇鏃舵樉绀烘椂闂�
+         updateClock();
+
+         // 姣忕鏇存柊涓€娆�
+         setInterval(updateClock, 1000);
+
+
+
+        // 淇濆瓨鍒發ocalStorage
         function saveTasks() {
             localStorage.setItem('tasks', JSON.stringify(tasks)); 
         }
     </script>
 </body>
-
 </html>
