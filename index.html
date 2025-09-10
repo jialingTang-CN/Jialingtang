@@ -3,7 +3,7 @@
 <head>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script> 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script> 
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>tangjialingTodoList</title>
@@ -126,13 +126,15 @@
             padding: 20px;
         }
         #p5-container {
+      position: fixed;
+      top: 20px;
+      left: 20px;
       width: 300px;
       height: 300px;
-      margin: 20px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      border-radius: 8px;
-      overflow: hidden;
+      z-index: 100;
+      pointer-events: none; /* 允许鼠标事件穿透 */
     }
+    
     
     /* 图表容器样式 */
     .chart-container {
@@ -143,6 +145,10 @@
       margin: 20px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       border-radius: 8px;
+    }
+        canvas[data-p5-canvas] {
+      background-color: transparent !important;
+      mix-blend-mode: multiply; /* 使黑色文字更突出 */
     }
     
     h2 {
@@ -502,6 +508,8 @@ function setup() {
   textFont("Helvetica");
   textSize(fontSize);
 }
+        background(0, 0);
+        }
  
 function pointForIndex(pct) {
   const NOISE_SCALE = 1.5;
@@ -638,6 +646,7 @@ function draw() {
     </script>
 </body>
 </html>
+
 
 
 
