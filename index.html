@@ -126,35 +126,35 @@
             padding: 20px;
         }
       #p5-container {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      width: 300px;
-      height: 300px;
-      z-index: 100;
-      pointer-events: none; /* 允许鼠标事件穿透 */
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        width: 300px;
+        height: 300px;
+        z-index: 100;
+        pointer-events: none; /* 允许鼠标事件穿透 */
     }
     
     
     /* 图表容器样式 */
-    .chart-container {
-      flex: 1;
-      min-width: 500px;
-      padding: 20px;
-      background: white;
-      margin: 20px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      border-radius: 8px;
-    }
-        canvas[data-p5-canvas] {
-      background-color: transparent !important;
-      mix-blend-mode: multiply; /* 使黑色文字更突出 */
-    }
-    
-    h2 {
-      color: #333;
-      text-align: center;
-    }
+        .chart-container {
+          flex: 1;
+          min-width: 500px;
+          padding: 20px;
+          background: white;  
+          margin: 20px;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+          border-radius: 8px;
+         }
+        canvas[data-p5-canvas] {        
+          background-color: transparent !important;
+          mix-blend-mode: multiply; /* 使黑色文字更突出 *      
+         }
+     
+         h2 {
+           color: #333;
+           text-align: center;
+         }
  
         .todo-app {
             width: 100%;
@@ -645,6 +645,7 @@ function draw() {
     </script>
 </body>
 </html>
+
 
 
 
