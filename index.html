@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>tangjialingTodoList</title>
@@ -122,6 +125,30 @@
 
             padding: 20px;
         }
+        #p5-container {
+      width: 300px;
+      height: 300px;
+      margin: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    /* 图表容器样式 */
+    .chart-container {
+      flex: 1;
+      min-width: 500px;
+      padding: 20px;
+      background: white;
+      margin: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+    
+    h2 {
+      color: #333;
+      text-align: center;
+    }
  
         .todo-app {
             width: 100%;
@@ -352,12 +379,14 @@
   z-index: 1000;
 ">
   <span id="current-time">00:00:00</span>
-  <div>
-
-    <button type="button"
-onclick="document.getElementById('demo').innerHTML = Date()">
-time.</button>
-
+  <!-- p5.js 容器 -->
+  <div id="p5-container"></div>
+  
+  <!-- 图表容器 -->
+  <div class="chart-container">
+    <h2>我的各科成绩分布 (3D立体效果)</h2>
+    <canvas id="scoreChart"></canvas>
+  </div>
 <p id="demo"></p>
     <div class="todo-app">
         <h1>Todo List</h1>
@@ -445,6 +474,153 @@ time.</button>
             document.getElementById('current-time').textContent = 
             `${hours}:${minutes}:${seconds}`;
         }
+        let textToWrite = "Hello Makerbean!";
+let SEGMENTS = 200;
+let PI = 3.1415926;
+let TWO_PI = PI * 2;
+let centerX, centerY, fontSize, INNER_RADIUS, RADIUS_VARIATION;
+ 
+class Point {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+}
+ 
+function setup() {
+  let canvas = createCanvas(280, 280);
+  canvas.parent('p5-container'); 
+  
+  centerX = width / 2;
+  centerY = height / 2;
+  let screenPct = min(height, width) / 1000;
+  fontSize = screenPct * 150;
+  INNER_RADIUS = screenPct * 200;
+  RADIUS_VARIATION = screenPct * 200;
+  
+  textFont("Helvetica");
+  textSize(fontSize);
+}
+ 
+function pointForIndex(pct) {
+  const NOISE_SCALE = 1.5;
+  let angle = pct * TWO_PI;
+  let cosAngle = cos(angle);
+  let sinAngle = sin(angle);
+  let time = frameCount / 100;
+  let noiseValue = noise(NOISE_SCALE * cosAngle + NOISE_SCALE, 
+                        NOISE_SCALE * sinAngle + NOISE_SCALE, 
+                        time);
+  let radius = INNER_RADIUS + RADIUS_VARIATION * noiseValue;
+  return new Point(radius * cosAngle + centerX, radius * sinAngle + centerY);
+}
+ 
+function draw() {
+  background(255);
+  fill(0);
+  noStroke();
+  
+  beginShape();
+  for (let i = 0; i < SEGMENTS; i++) {
+    let p0 = pointForIndex(i / SEGMENTS);
+    vertex(p0.x, p0.y);
+  }
+  endShape(CLOSE);
+ 
+  let pct = atan2(mouseY - centerY, mouseX - centerX) / TWO_PI;
+  let pixToAngularPct = 1 / ((INNER_RADIUS + RADIUS_VARIATION / 2) * TWO_PI);
+ 
+  for (let textChar of textToWrite) {
+    let charWidth = textWidth(textChar);
+    pct += charWidth/2 * pixToAngularPct;
+    
+    let leftP = pointForIndex(pct-0.01);
+    let rightP = pointForIndex(pct+0.01);
+    let angle = atan2(leftP.y - rightP.y, leftP.x - rightP.x) + PI;
+    
+    push();
+    let point = pointForIndex(pct);
+    translate(point.x, point.y);
+    rotate(angle);
+    translate(-point.x, -point.y);
+    text(textChar, point.x-charWidth/2, point.y);
+    pop();
+    
+    pct += charWidth/2 * pixToAngularPct;
+  }
+}
+        document.addEventListener('DOMContentLoaded',  function() {
+  const ctx = document.getElementById('scoreChart').getContext('2d'); 
+  
+  // 示例成绩数据 - 请替换为你的实际成绩
+  const scoreData = {
+    labels: ['语文', '数学', '英语', '政治', '历史', '地理', '生物', '化学'],
+    datasets: [{
+      data: [85, 90, 88, 78, 82, 80, 86, 84],
+      backgroundColor: [
+        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+        '#9966FF', '#FF9F40', '#8AC24A', '#FF5722'
+      ],
+      borderColor: '#fff',
+      borderWidth: 2,
+      hoverOffset: 20,  // 悬停时突出效果 
+      weight: 1 
+    }]
+  };
+ 
+  // 3D立体效果配置 
+  const config = {
+    type: 'pie',
+    data: scoreData,
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'right',
+        },
+        title: {
+          display: true,
+          text: '各科成绩占比',
+          font: {
+            size: 18 
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const label = context.label  || '';
+              const value = context.raw  || 0;
+              const total = context.dataset.data.reduce((a,  b) => a + b, 0);
+              const percentage = Math.round((value  / total) * 100);
+              return `${label}: ${value}分 (${percentage}%)`;
+            }
+          }
+        },
+        // 3D立体效果 
+        datalabels: {
+          formatter: (value, ctx) => {
+            const total = ctx.chart.data.datasets[0].data.reduce((a,  b) => a + b, 0);
+            const percentage = Math.round((value  / total) * 100) + '%';
+            return percentage;
+          },
+          color: '#fff',
+          font: {
+            weight: 'bold'
+          }
+        }
+      },
+      // 3D旋转效果
+      animation: { 
+        animateScale: true,
+        animateRotate: true
+      }
+    },
+    plugins: [ChartDataLabels]  // 启用数据标签插件 
+  };
+ 
+  // 创建图表 
+  new Chart(ctx, config);
+});
 
         // 鍒濆鍔犺浇鏃舵樉绀烘椂闂�
          updateClock();
@@ -461,4 +637,5 @@ time.</button>
     </script>
 </body>
 </html>
+
 
