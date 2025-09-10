@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script> 
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script> 
+ 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>纯JS精美TodoList</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+ 
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: 
+
+                /* 左上角明显渐变 */
+
+                radial-gradient(circle at 15% 15%, 
+
+                    rgba(200, 230, 255, 0.9) 0%, 
+
+                    rgba(200, 230, 255, 0.6) 30%,
+
+                    transparent 60%),
+
+                
+
+                /* 右下角明显渐变 */
+
+                radial-gradient(ellipse at 85% 85%, 
+
+                    rgba(240, 248, 255, 1) 0%, 
+
+                    rgba(224, 240, 255, 0.7) 40%,
+
+                    transparent 70%),
+
+                
+
+                /* 中间右侧辅助渐变 */
+
+                radial-gradient(circle at 70% 50%, 
+
+                    rgba(220, 240, 255, 0.8) 0%,
+
+                    transparent 50%),
+
+                
+
+                /* 基底渐变 */
+
+                linear-gradient(145deg, 
+
+                    #e1f0ff 0%, 
+
+                    #f0f8ff 100%);
+
+            
+
+            /* 兼容性处理 */
+
+            background: 
+
+                -webkit-radial-gradient(15% 15%, circle, 
+
+                    rgba(200, 230, 255, 0.9) 0%, 
+
+                    rgba(200, 230, 255, 0.6) 30%,
+
+                    transparent 60%),
+
+                -webkit-radial-gradient(85% 85%, ellipse, 
+
+                    rgba(240, 248, 255, 1) 0%, 
+
+                    rgba(224, 240, 255, 0.7) 40%,
+
+                    transparent 70%),
+
+                -webkit-radial-gradient(70% 50%, circle, 
+
+                    rgba(220, 240, 255, 0.8) 0%,
+
+                    transparent 50%),
+
+                -webkit-linear-gradient(145deg, #e1f0ff 0%, #f0f8ff 100%);
+
+                
+
+            background: 
+
+                -moz-radial-gradient(15% 15%, circle, 
+
+                    rgba(200, 230, 255, 0.9) 0%, 
+
+                    rgba(200, 230, 255, 0.6) 30%,
+
+                    transparent 60%),
+
+                -moz-radial-gradient(85% 85%, ellipse, 
+
+                    rgba(240, 248, 255, 1) 0%, 
+
+                    rgba(224, 240, 255, 0.7) 40%,
+
+                    transparent 70%),
+
+                -moz-radial-gradient(70% 50%, circle, 
+
+                    rgba(220, 240, 255, 0.8) 0%,
+
+                    transparent 50%),
+
+                -moz-linear-gradient(145deg, #e1f0ff 0%, #f0f8ff 100%);
+
+            padding: 20px;
+        }
+ 
+        #p5-container {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 300px;
+      height: 300px;
+      z-index: 100;
+      pointer-events: none; /* 允许鼠标事件穿透 */
+    }
+        
+         canvas[data-p5-canvas] {
+      background-color: transparent !important;
+      mix-blend-mode: multiply; /* 使黑色文字更突出 */
+    }
+    
+    /* 图表容器样式 */
+    .chart-container {
+      max-width: 600px;
+      margin: 80px auto;
+      padding: 20px;
+      background: rgb(114, 69, 69);
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+        
+        
+        
+        
+        
+        
+        
+        
+        .todo-app {
+            width: 100%;
+            max-width: 450px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            
+        }
+ 
+        h1 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+ 
+        .input-area {
+            display: flex;
+            margin-bottom: 25px;
+        }
+ 
+        #new-task {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 12px 0 0 12px;
+            outline: none;
+            font-size: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+ 
+        #add-btn {
+            padding: 15px 20px;
+            background: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 0 12px 12px 0;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: background 0.3s;
+        }
+ 
+        #add-btn:hover {
+            background: #3182ce;
+        }
+ 
+        #task-list {
+            list-style: none;
+        }
+ 
+        .task-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.3s ease;
+        }
+ 
+        .task-item:last-child {
+            margin-bottom: 0;
+        }
+ 
+        .task-item input[type="checkbox"] {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+ 
+        .task-text {
+            flex: 1;
+            font-size: 16px;
+            color: #4a5568;
+        }
+ 
+        .completed .task-text {
+            text-decoration: line-through;
+            color: #a0aec0;
+        }
+ 
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #e53e3e;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+            transition: transform 0.2s;
+        }
+
+        .task-item:last-child {
+
+            margin-bottom: 0;
+
+        }
+
+
+
+        .task-item input[type="checkbox"] {
+
+            margin-right: 15px;
+
+            width: 20px;
+
+            height: 20px;
+
+            cursor: pointer;
+
+        }
+
+
+
+        .task-text {
+
+            flex: 1;
+
+            font-size: 16px;
+
+            color: #4a5568;
+
+        }
+
+
+
+        .completed .task-text {
+
+            text-decoration: line-through;
+
+            color: #a0aec0;
+
+        }
+
+
+
+        .delete-btn {
+
+            background: none;
+
+            border: none;
+
+            color: #e53e3e;
+
+            font-size: 18px;
+
+            cursor: pointer;
+
+            padding: 5px;
+
+            transition: transform 0.2s;
+
+        }
+
+
+
+        .delete-btn:hover {
+
+            transform: scale(1.1);
+
+        }
+
+
+
+        .fade-out {
+
+            opacity: 0;
+
+            transform: translateX(-20px);
+
+            transition: all 0.3s ease;
+
+        }
+
+
+
+        .guide {
+
+            position: absolute;
+
+            font-family: Arial, sans-serif;
+
+            color: #5a7a8a;
+
+            padding: 10px;
+
+            background: rgba(255,255,255,0.7);
+
+            border-radius: 5px;
+
+        }
+
+        .guide-1 { top: 15%; left: 15%; }
+
+        .guide-2 { bottom: 15%; right: 15%; }
+
+
+
+        @keyframes fadeIn {
+
+            from {
+
+                opacity: 0;
+
+                transform: translateY(10px);
+
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+      <!-- p5.js 容器 - 固定在左上角 -->
+  <div id="p5-container"></div>
+  
+  <!-- 3D饼图容器 -->
+  <div class="chart-container">
+    <canvas id="gradeChart"></canvas>
+  </div>
+  
+    <div id="realtime-clock" style="
+    
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(0,0,0,0.7);
+  padding: 10px 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(68, 59, 116, 0.15);
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+  opacity: 0.6;
+  filter: brightness(2px);
+">
+  <span id="current-time">00:00:00</span>
+</div>
+
+    
+
+    <div class="todo-app">
+        <h1>Todo List</h1>
+        <div class="input-area">
+            <input type="text" id="new-task" placeholder="Add a new task...">
+            <button id="add-btn">+</button>
+        </div>
+        <ul id="task-list"></ul>
+    </div>
+
+    <script>
+        // 任务数组初始化（从localStorage加载）
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+        // DOM元素
+        const taskInput = document.getElementById('new-task'); 
+        const addButton = document.getElementById('add-btn'); 
+        const taskList = document.getElementById('task-list'); 
+
+        // 初始化渲染
+        renderTasks();
+
+        // 添加任务
+        addButton.addEventListener('click', addTask);
+        taskInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+
+        function addTask() {
+            const taskText = taskInput.value.trim(); 
+            if (taskText) {
+                tasks.push({ text: taskText, completed: false });
+                saveTasks();
+                renderTasks();
+                taskInput.value = '';
+                taskInput.focus(); 
+            }
+        }
+
+        // 渲染任务列表（带动画）
+        function renderTasks() {
+            taskList.innerHTML = '';
+            tasks.forEach((task, index) => {
+                const li = document.createElement('li'); 
+                li.className = 'task-item';
+                if (task.completed) {
+                    li.classList.add('completed'); 
+                }
+                li.innerHTML = `
+                    <input type="checkbox" ${task.completed ? 'checked' : ''}>
+                    <span class="task-text">${task.text}</span> 
+                    <button class="delete-btn">✕</button>
+                `;
+                taskList.appendChild(li); 
+
+                // 事件绑定：删除任务
+                li.querySelector('.delete-btn').addEventListener('click', () => {
+                    li.classList.add('fade-out'); 
+                    setTimeout(() => {
+                        tasks.splice(index, 1);
+                        saveTasks();
+                        renderTasks();
+                    }, 300);
+                });
+
+                // 事件绑定：切换任务状态
+                li.querySelector('input').addEventListener('change', () => {
+                    task.completed = !task.completed; 
+                    li.classList.toggle('completed', task.completed); 
+                    saveTasks();
+                });
+            });
+        }
+
+        function updateClock() {
+            const now = new Date();
+            // 只提取时分秒并格式化为两位数
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            // 更新显示
+            document.getElementById('current-time').textContent = 
+            `${hours}:${minutes}:${seconds}`;
+        }
+
+        // 初始加载时显示时间
+         updateClock();
+
+         // 每秒更新一次
+         setInterval(updateClock, 1000);
+
+
+
+        // 保存到localStorage
+        function saveTasks() {
+            localStorage.setItem('tasks', JSON.stringify(tasks)); 
+        }
+
+
+
+
+        // ============== 完整保留的p5.js 代码 ==============
+
+        let textToWrite = "唐嘉翎";
+
+        let SEGMENTS = 200;
+
+        let PI = 3.1415926;
+
+        let TWO_PI = PI * 2;
+   
+
+        class Point {
+  
+            constructor(x, y) {
+  
+                this.x = x;
+  
+                this.y = y;
+ 
+            }
+
+        }
+
+
+        function setup() {
+  
+            // 创建画布时指定到p5-container元素中
+  
+            let canvas = createCanvas(300, 300);
+  
+            canvas.parent('p5-container'); 
+  
+
+  
+            centerX = width / 2;
+  
+            centerY = height / 2;
+  
+ 
+            let screenPct = min(height, width) / 1000;
+ 
+            fontSize = screenPct * 150;
+ 
+            INNER_RADIUS = screenPct * 200;
+ 
+            RADIUS_VARIATION = screenPct * 200;
+  
+  
+            textFont("Helvetica");
+ 
+            textSize(fontSize);
+  
+ 
+            // 设置透明背景
+ 
+ 
+            background(0, 0);
+
+        }
+
+
+        function pointForIndex(pct) {
+  
+            const NOISE_SCALE = 1.5;
+ 
+            let angle = pct * TWO_PI;
+  
+            let cosAngle = cos(angle);
+ 
+ 
+  
+            let sinAngle = sin(angle);
+ 
+            let time = frameCount / 100;
+ 
+            let noiseValue = noise(NOISE_SCALE * cosAngle + NOISE_SCALE, 
+  
+            NOISE_SCALE * sinAngle + NOISE_SCALE, 
+   
+            time);
+
+            let radius = INNER_RADIUS + RADIUS_VARIATION * noiseValue;
+  
+            return new Point(radius * cosAngle + centerX, radius * sinAngle + centerY);
+
+  
+        }
+
+
+  
+        function draw() {
+  
+            // 清除画布但保持透明
+  
+            clear();
+  
+  
+            fill(0); // 只保留黑色文字
+ 
+            noStroke();
+  
+ 
+            beginShape();
+ 
+
+            for (let i = 0; i < SEGMENTS; i++) {
+  
+                let p0 = pointForIndex(i / SEGMENTS);
+  
+  
+                vertex(p0.x, p0.y);
+ 
+
+
+            }
+ 
+            endShape(CLOSE);
+
+
+            let pct = atan2(mouseY - centerY, mouseX - centerX) / TWO_PI;
+ 
+            let pixToAngularPct = 1 / ((INNER_RADIUS + RADIUS_VARIATION / 2) * TWO_PI);
+
+
+
+            for (let textChar of textToWrite) {
+   
+                let charWidth = textWidth(textChar);
+  
+                pct += charWidth/2 * pixToAngularPct;
+  
+    
+  
+                let leftP = pointForIndex(pct-0.01);
+   
+                let rightP = pointForIndex(pct+0.01);
+   
+                let angle = atan2(leftP.y - rightP.y, leftP.x - rightP.x) + PI;
+    
+  
+                push();
+ 
+                let point = pointForIndex(pct);
+  
+                translate(point.x, point.y);
+   
+                rotate(angle);
+  
+                translate(-point.x, -point.y);
+  
+                text(textChar, point.x-charWidth/2, point.y);
+ 
+                pop();
+    
+
+                pct += charWidth/2 * pixToAngularPct;
+
+            }
+
+        }
+
+
+
+
+        // ============== p5.js 代码结束 ==============
+
+
+
+        // 3D饼图配置
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+  
+            const ctx = document.getElementById('gradeChart').getContext('2d'); 
+  
+  
+            // 模拟成绩数据
+  
+            const gradeData = {
+   
+                labels: ['语文', '数学', '英语', '政治', '历史', '地理', '生物', '化学'],
+    
+                datasets: [{
+    
+                    data: [85, 92, 88, 76, 82, 79, 91, 84],
+    
+                    backgroundColor: [
+   
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+  
+                    '#9966FF', '#FF9F40', '#8AC249', '#EA5545'
+   
+                ],
+  
+                borderWidth: 1,
+  
+                borderColor: '#fff',
+   
+                hoverBorderWidth: 2,
+  
+ 
+            }]
+  
+        };
+
+  
+        // 创建3D效果的饼图
+ 
+        new Chart(ctx, {
+  
+            type: 'pie',
+   
+            data: gradeData,
+   
+            options: {
+  
+                responsive: true,
+  
+                plugins: {
+   
+    
+                    legend: {
+   
+                        position: 'right',
+   
+                    },
+   
+                    title: {
+  
+                        display: true,
+  
+                        text: '各科成绩分布',
+  
+                        font: {
+  
+                            size: 18
+  
+                        }
+  
+                    },
+  
+                    // 使用datalabels插件显示百分比
+  
+                    datalabels: {
+  
+                        formatter: (value, ctx) => {
+  
+                            const sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+  
+                            const percentage = (value * 100 / sum).toFixed(1) + '%';
+  
+                            return percentage;
+  
+                        },
+  
+                        color: '#fff',
+  
+                        font: {
+  
+                            weight: 'bold'
+   
+                        }
+   
+                    },
+   
+                    // 添加3D阴影效果
+   
+   
+                    shadow: {
+   
+                        enabled: true,
+   
+                        color: 'rgba(0,0,0,0.3)',
+   
+                        blur: 10,
+   
+                        offsetX: 3,
+   
+                        offsetY: 3
+   
+                    }
+   
+                },
+   
+                // 3D效果设置
+   
+                cutout: '60%',
+   
+                rotation: -30,
+   
+                circumference: 250,
+   
+                animation: {
+   
+                    animateScale: true,
+   
+                    animateRotate: true
+
+                }
+   
+            },
+   
+            plugins: [ChartDataLabels]
+ 
+        }
+
+    );
+
+});
+
+</script>
+
+</body>
+</html>
