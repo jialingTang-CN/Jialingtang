@@ -539,6 +539,7 @@ function preloadAndDisplayImage(url) {
   img.style.height  = 'auto';
   img.style.display  = 'none'; // 初始隐藏 
   transition: opacity 0.5s ease;
+  img.style.borderRadius  = '16px'; // 圆角半径
   
   // 添加到DOM 
   container.appendChild(img); 
@@ -883,6 +884,7 @@ const photoContainer = preloadAndDisplayImage(photoUrl);
 </body>
 
 </html>
+
 
 
 
