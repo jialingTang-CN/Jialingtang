@@ -528,7 +528,7 @@ function preloadAndDisplayImage(url) {
   container.style.background  = 'rgba(0, 0, 0, 0.7)';
   container.style.opacity  = '0';
   container.style.transition  = 'opacity 0.3s';
-  container.style.borderRadius  = '16px';
+  container.style.borderRadius  = '1px';
     
   // 创建图片元素 
   const img = new Image();
@@ -538,6 +538,7 @@ function preloadAndDisplayImage(url) {
   img.style.width  = 'auto';
   img.style.height  = 'auto';
   img.style.display  = 'none'; // 初始隐藏 
+  transition: opacity 0.5s ease;
   
   // 添加到DOM 
   container.appendChild(img); 
@@ -882,6 +883,7 @@ const photoContainer = preloadAndDisplayImage(photoUrl);
 </body>
 
 </html>
+
 
 
 
