@@ -182,10 +182,6 @@
             display: flex;
             margin-bottom: 25px;
         }
-
-        .a_button {
-            border-radius: 16px;
-        }
  
         #new-task {
             flex: 1;
@@ -538,7 +534,7 @@ document.addEventListener('DOMContentLoaded',  function() {
     preloadedImage = img;
     const button = document.getElementById('a_button'); 
     button.disabled  = false;
-    button.textContent  = '点击显示图片和叉号';
+    button.textContent  = '点击显示图片';
   };
   img.onerror  = function() {
     console.error(' 图片预加载失败');
@@ -592,7 +588,11 @@ document.getElementById('a_button').addEventListener('click',  function() {
     setTimeout(() => container.remove(),  300);
   });
 
-  // 点击背景关闭容...
+  // 点击背景关闭容器
+  container.addEventListener('click',  (e) => {
+    if (e.target  === container) {
+      container.style.opacity  = '0';
+      setTimeout(() => container.remove(),  300);
     }
   });
 });
@@ -914,6 +914,7 @@ document.getElementById('a_button').addEventListener('click',  function() {
 </body>
 
 </html>
+
 
 
 
