@@ -517,72 +517,82 @@
         }
 
         // 预加载图片并显示 
-let preloadedImage = null; // 存储预加载的图片对象
-const imageUrl = '9.11.jpg';  // 替换为你的图片URL
+// 1. 预加载图片（页面加载时执行，保持原预加载逻辑）
+let preloadedImage = null;
+const imageUrl = '9.11.jpg';  // 你的图片路径
+const svgXCode = `
+  <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"> 
+    <line x1="30" y1="30" x2="70" y2="70" stroke="white" stroke-width="6" stroke-linecap="round"/>
+    <line x1="70" y1="30" x2="30" y2="70" stroke="white" stroke-width="6" stroke-linecap="round"/>
+  </svg>
+`; // 你的 SVG 叉号代码（可替换为实际内容）
 
-// 页面加载完成后开始预加载图片
 document.addEventListener('DOMContentLoaded',  function() {
   const img = new Image();
-  img.src  = imageUrl; // 触发预加载，图片会缓存到浏览器
-
-  // 预加载成功：存储图片对象，启用按钮
+  img.src  = imageUrl;
   img.onload  = function() {
-    preloadedImage = img; // 保存预加载的图片
+    preloadedImage = img;
     const button = document.getElementById('a_button'); 
-    button.disabled  = false; // 启用按钮
-    button.textContent  = '点击显示图片'; // 更新按钮文字
+    button.disabled  = false;
+    button.textContent  = '点击显示图片和叉号';
   };
-
-  // 预加载失败：提示错误
   img.onerror  = function() {
-    console.error(' 图片预加载失败，请检查URL是否正确');
+    console.error(' 图片预加载失败');
     document.getElementById('a_button').textContent  = '加载失败';
   };
 });
 
-// 2. 点击按钮显示容器（使用预加载的图片）
+// 2. 点击按钮显示容器（包含 SVG 叉号和图片）
 document.getElementById('a_button').addEventListener('click',  function() {
-  if (!preloadedImage) {
-    alert('图片尚未加载完成，请稍候');
-    return;
-  }
+  if (!preloadedImage) return;
 
-  // 创建容器（复用之前的样式逻辑）
+  // 创建外层容器（黑色背景）
   const container = document.createElement('div'); 
-  container.style.position  = 'fixed';
-  container.style.top  = '0';
-  container.style.left  = '0';
-  container.style.width  = '100%';
-  container.style.height  = '100%';
-  container.style.display  = 'flex';
-  container.style.justifyContent  = 'center';
-  container.style.alignItems  = 'center';
-  container.style.zIndex  = '9999';
-  container.style.background  = 'rgba(0, 0, 0, 0.7)';
-  container.style.opacity  = '0';
-  container.style.transition  = 'opacity 0.3s';
-  container.style.borderRadius  = '1px';
+  container.style.cssText  = `
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; justify-content: center; align-items: center;
+    background: rgba(0,0,0,0.7); z-index: 9999; opacity: 0;
+    transition: opacity 0.3s; border-radius: 1px;
+  `;
 
-  // 使用预加载的图片（直接从缓存读取，无需重新加载）
-  const img = preloadedImage.cloneNode();  // 克隆预加载的图片对象（避免影响原对象）
-  img.style.maxWidth  = '80vw';
-  img.style.maxHeight  = '80vh';
-  img.style.width  = 'auto';
-  img.style.height  = 'auto';
-  img.style.borderRadius  = '16px';
+  // 创建“叉号+图片”的横向容器（flex 布局）
+  const contentWrapper = document.createElement('div'); 
+  contentWrapper.style.cssText  = `
+    display: flex; align-items: center; gap: 20px; /* 叉号和图片间距 */
+  `;
 
-  // 添加到页面并显示动画
-  container.appendChild(img); 
+  // 创建 SVG 叉号元素
+  const svgX = document.createElement('div'); 
+  svgX.innerHTML  = svgXCode; // 插入 SVG 代码
+  svgX.style.cursor  = 'pointer'; // 鼠标悬停显示手型（可选：点击叉号关闭）
+
+  // 创建图片元素（复用预加载的图片）
+  const img = preloadedImage.cloneNode(); 
+  img.style.cssText  = `
+    max-width: 80vw; max-height: 80vh;
+    width: auto; height: auto; border-radius: 16px;
+  `;
+
+  // 将叉号和图片添加到横向容器
+  contentWrapper.appendChild(svgX); 
+  contentWrapper.appendChild(img); 
+  container.appendChild(contentWrapper); 
   document.body.appendChild(container); 
-  setTimeout(() => {
-    container.style.opacity  = '1'; // 容器淡入
-  }, 10);
+
+  // 淡入显示
+  setTimeout(() => container.style.opacity  = '1', 10);
+
+  // 可选：点击叉号关闭容器
+  svgX.addEventListener('click',  () => {
+    container.style.opacity  = '0';
+    setTimeout(() => container.remove(),  300);
+  });
 
   // 点击背景关闭容器
-  container.addEventListener('click',  function(e) {
+  container.addEventListener('click',  (e) => {
     if (e.target  === container) {
       container.style.opacity  = '0';
-    setTimeout(() => container.remove(),  300);
+      setTimeout(() => container.remove(),  300);
     }
   });
 });
@@ -904,6 +914,7 @@ document.getElementById('a_button').addEventListener('click',  function() {
 </body>
 
 </html>
+
 
 
 
