@@ -386,6 +386,10 @@
   <!-- 3D饼图容器 -->
   <div class="chart-container">
     <canvas id="gradeChart"></canvas>
+    <!-- HTML：按钮 --> 
+    <button id="a_button" disabled>加载中...</button> <!-- 初始禁用，预加载完成后启用 --> 
+ 
+  
   </div>
   
     <div id="realtime-clock" style="
@@ -513,8 +517,37 @@
         }
 
         // 预加载图片并显示 
-function preloadAndDisplayImage(url) {
-  // 创建图片容器 
+let preloadedImage = null; // 存储预加载的图片对象
+const imageUrl = 'https://example.com/your-image.jpg';  // 替换为你的图片URL
+
+// 页面加载完成后开始预加载图片
+document.addEventListener('DOMContentLoaded',  function() {
+  const img = new Image();
+  img.src  = imageUrl; // 触发预加载，图片会缓存到浏览器
+
+  // 预加载成功：存储图片对象，启用按钮
+  img.onload  = function() {
+    preloadedImage = img; // 保存预加载的图片
+    const button = document.getElementById('a_button'); 
+    button.disabled  = false; // 启用按钮
+    button.textContent  = '点击显示图片'; // 更新按钮文字
+  };
+
+  // 预加载失败：提示错误
+  img.onerror  = function() {
+    console.error(' 图片预加载失败，请检查URL是否正确');
+    document.getElementById('a_button').textContent  = '加载失败';
+  };
+});
+
+// 2. 点击按钮显示容器（使用预加载的图片）
+document.getElementById('a_button').addEventListener('click',  function() {
+  if (!preloadedImage) {
+    alert('图片尚未加载完成，请稍候');
+    return;
+  }
+
+  // 创建容器（复用之前的样式逻辑）
   const container = document.createElement('div'); 
   container.style.position  = 'fixed';
   container.style.top  = '0';
@@ -529,38 +562,26 @@ function preloadAndDisplayImage(url) {
   container.style.opacity  = '0';
   container.style.transition  = 'opacity 0.3s';
   container.style.borderRadius  = '1px';
-    
-  // 创建图片元素 
-  const img = new Image();
-  img.src  = url;
+
+  // 使用预加载的图片（直接从缓存读取，无需重新加载）
+  const img = preloadedImage.cloneNode();  // 克隆预加载的图片对象（避免影响原对象）
   img.style.maxWidth  = '80vw';
   img.style.maxHeight  = '80vh';
   img.style.width  = 'auto';
   img.style.height  = 'auto';
-  img.style.display  = 'none'; // 初始隐藏
-  img.style.borderRadius  = '16px'; // 圆角半径
-  
-  // 添加到DOM 
+  img.style.borderRadius  = '16px';
+
+  // 添加到页面并显示动画
   container.appendChild(img); 
   document.body.appendChild(container); 
-  
-  // 监听图片加载 
-  img.onload  = function() {
-    // 图片加载完成后渐显 
-    setTimeout(() => {
-      container.style.opacity  = '1';
-      img.style.display  = 'block';
-    }, 100); // 短暂延迟以确保渲染 
-  };
-  
-  // 错误处理 
-  img.onerror  = function(e) {
-    console.error(' 图片加载失败:', e);
-    container.remove(); 
-  };
-  
-  return container;
-}
+  setTimeout(() => {
+    container.style.opacity  = '1'; // 容器淡入
+  }, 10);
+
+  // 点击背景关闭容器
+  container.addEventListener('click',  function(e) {
+    if (e.target  === container) {
+      container.style.opacity  = '0';
  
 // 使用示例 
 const photoUrl = '9.11.jpg'; 
@@ -883,6 +904,7 @@ const photoContainer = preloadAndDisplayImage(photoUrl);
 </body>
 
 </html>
+
 
 
 
