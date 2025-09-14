@@ -182,6 +182,45 @@
             display: flex;
             margin-bottom: 25px;
         }
+
+        #a_button { 
+  
+    
+            /* 基础按钮样式（可选，根据需要调整） */ 
+ 
+            padding: 8px 16px; /* 内边距 */ 
+
+            border: none; /* 去除默认边框 */ 
+
+
+            border-radius: 4px; /* 圆角（可选） */ 
+
+            font-size: 14px; /* 字体大小 */ 
+
+            cursor: pointer; /* 鼠标悬停显示手型 */ 
+  
+
+            /* 核心：添加阴影效果 */ 
+
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* 水平偏移 0，垂直偏移 2px，模糊 5px，颜色半透明黑 */ 
+  
+
+            /* 可选：禁用状态下的阴影（更浅） */ 
+
+            &:disabled { 
+
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* 禁用时阴影变浅 */ 
+
+                cursor: not-allowed; /* 禁用时鼠标显示“禁止”图标 */ 
+
+            } 
+            &:not(:disabled):hover {
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); /* 悬停时阴影更大更明显 */ 
+
+            } 
+
+        } 
+
  
         #new-task {
             flex: 1;
@@ -918,6 +957,7 @@ document.getElementById('a_button').addEventListener('click',  function() {
 </body>
 
 </html>
+
 
 
 
