@@ -467,17 +467,18 @@
         <ul id="task-list"></ul>
     </div>
     <button id="toggleButton" style=" 
-        color: #000; /* 文字颜色不透明（黑色，可改为其他颜色） */ 
-        background: transparent; /* 背景完全透明 */ 
-        border: none; /* 去除边框（或设为透明边框） */ 
-        padding: 8px 16px; /* 保留内边距，确保点击区域 */ 
-        cursor: pointer; /* 鼠标悬停显示手型 */ 
-        /* 可选：若需要透明边框，替换 border: none 为：
-        border: 1px solid transparent; 
-        */ 
-        "> 
-  按钮文字（不透明） 
-</button> 
+  position: fixed; /* 固定定位，相对于视口 */ 
+  left: 50%; /* 水平居中 */ 
+  transform: translateX(-50%); /* 精确居中（抵消left:50%的偏移） */ 
+  bottom: 20px; /* 距离底部20px（可调整） */ 
+  color: #000; /* 文字不透明 */ 
+  background: transparent; /* 背景透明 */ 
+  border: none; /* 边框透明 */ 
+  padding: 12px 24px; 
+  font-size: 18px; 
+  cursor: pointer; 
+  z-index: 1000; /* 确保在容器上方 */ 
+"> 
 
     <script>
         // 任务数组初始化（从localStorage加载）
@@ -646,36 +647,42 @@ document.getElementById('a_button').addEventListener('click',  function() {
     setTimeout(() => container.remove(),  300);
   });
 
-  // 点击背景关闭容器
-  container.addEventListener('click',  (e) => {
-    if (e.target  === container) {
-      container.style.opacity  = '0';
-      setTimeout(() => container.remove(),  300);
+  // 点击背景关闭容器deled
+  
     }
   });
 });
-            // 获取按钮和两个容器 
-        const toggleButton = document.getElementById('toggleButton');  
-        const todoApp = document.querySelector('.todo-app');  
-        const chartContainer = document.querySelector('.chart-container');  
+            const toggleButton = document.getElementById('toggleButton');  
+const todoApp = document.querySelector('.todo-app');  
+const chartContainer = document.querySelector('.chart-container');  
  
-        // 初始状态：显示 Todo，隐藏图表 
-        let isTodoVisible = true; 
-        chartContainer.style.display  = 'none'; // 确保图表初始隐藏 
-
-        // 点击切换 
-        toggleButton.addEventListener('click',  function() { 
-            if (isTodoVisible) { 
-                // 隐藏 Todo，显示图表 
-                todoApp.style.display  = 'none'; 
-                chartContainer.style.display  = 'block'; // 若图表容器是 flex，改为 'flex' 
-            } else { 
-                // 隐藏图表，显示 Todo 
-                chartContainer.style.display  = 'none'; 
-                todoApp.style.display  = 'block'; // 若 Todo 容器是 flex，改为 'flex' 
-            } 
-            isTodoVisible = !isTodoVisible; // 切换状态 
-        }); 
+// 初始状态：显示Todo，隐藏图表 
+let isTodoVisible = true; 
+chartContainer.style.display  = 'none'; 
+ 
+// 确保容器初始居中（覆盖可能的原有样式） 
+todoApp.style.position  = 'absolute'; 
+todoApp.style.top  = '50%'; 
+todoApp.style.left  = '50%'; 
+todoApp.style.transform  = 'translate(-50%, -50%)'; 
+chartContainer.style.position  = 'absolute'; 
+chartContainer.style.top  = '50%'; 
+chartContainer.style.left  = '50%'; 
+chartContainer.style.transform  = 'translate(-50%, -50%)'; 
+ 
+// 按钮点击切换逻辑 
+toggleButton.addEventListener('click',  function() { 
+  if (isTodoVisible) { 
+    // 显示图表，隐藏Todo 
+    todoApp.style.display  = 'none'; 
+    chartContainer.style.display  = 'block'; 
+  } else { 
+    // 显示Todo，隐藏图表 
+    chartContainer.style.display  = 'none'; 
+    todoApp.style.display  = 'block'; 
+  } 
+  isTodoVisible = !isTodoVisible; 
+}); 
 
 
         
@@ -996,6 +1003,7 @@ document.getElementById('a_button').addEventListener('click',  function() {
 </body>
 
 </html>
+
 
 
 
