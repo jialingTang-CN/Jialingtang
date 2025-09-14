@@ -169,29 +169,15 @@
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             padding: 25px;
-            todo-app" style="display: block;
+            display: block;
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%);
             
         }
 
-        /* 文字跳动动画 */ 
-@keyframes bounce { 
-  0%, 100% { transform: translateY(0); } 
-  50% { transform: translateY(-8px); } /* 向上跳动8px（可调整） */ 
-} 
  
-/* 应用动画到按钮文字 */ 
-#toggleButton { 
-  animation: bounce 2s infinite ease-in-out; /* 2秒/次，无限循环 */ 
-} 
- 
-/* 容器居中样式（确保原有大小） */ 
-.todo-app, .chart-container { 
-  position: absolute; 
-  top: 50%; 
-  left: 50%; 
-  transform: translate(-50%, -50%); /* 绝对居中 */ 
-  /* 保留原有大小（不设置width/height，使用内容自身尺寸） */ 
-} 
  
         h1 {
             color: #2d3748;
@@ -1023,6 +1009,7 @@ toggleButton.addEventListener('click',  function() {
 </body>
 
 </html>
+
 
 
 
