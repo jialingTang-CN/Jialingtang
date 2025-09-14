@@ -582,10 +582,10 @@ document.getElementById('a_button').addEventListener('click',  function() {
   container.addEventListener('click',  function(e) {
     if (e.target  === container) {
       container.style.opacity  = '0';
- 
-// 使用示例 
-const photoUrl = '9.11.jpg'; 
-const photoContainer = preloadAndDisplayImage(photoUrl);
+    setTimeout(() => container.remove(),  300);
+    }
+  });
+});
 
 
 
@@ -904,6 +904,7 @@ const photoContainer = preloadAndDisplayImage(photoUrl);
 </body>
 
 </html>
+
 
 
 
