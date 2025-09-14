@@ -182,6 +182,11 @@
             display: flex;
             margin-bottom: 25px;
         }
+
+        .a_button {
+            color: #e53e3e;
+            border-radius: 16px;
+        }
  
         #new-task {
             flex: 1;
@@ -588,11 +593,7 @@ document.getElementById('a_button').addEventListener('click',  function() {
     setTimeout(() => container.remove(),  300);
   });
 
-  // 点击背景关闭容器
-  container.addEventListener('click',  (e) => {
-    if (e.target  === container) {
-      container.style.opacity  = '0';
-      setTimeout(() => container.remove(),  300);
+  // 点击背景关闭容...
     }
   });
 });
@@ -914,6 +915,7 @@ document.getElementById('a_button').addEventListener('click',  function() {
 </body>
 
 </html>
+
 
 
 
