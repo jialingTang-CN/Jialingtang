@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script> 
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script> 
+ 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>唐嘉翎's TodoList</title>
+    <style>
+        @font-face {
+            font-family: 'JDFXS';
+            src: url('09.TTF') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+ 
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: 
+
+                /* 左上角明显渐变 */
+
+                radial-gradient(circle at 15% 15%, 
+
+                    rgba(200, 230, 255, 0.9) 0%, 
+
+                    rgba(200, 230, 255, 0.6) 30%,
+
+                    transparent 60%),
+
+                
+
+                /* 右下角明显渐变 */
+
+                radial-gradient(ellipse at 85% 85%, 
+
+                    rgba(240, 248, 255, 1) 0%, 
+
+                    rgba(224, 240, 255, 0.7) 40%,
+
+                    transparent 70%),
+
+                
+
+                /* 中间右侧辅助渐变 */
+
+                radial-gradient(circle at 70% 50%, 
+
+                    rgba(220, 240, 255, 0.8) 0%,
+
+                    transparent 50%),
+
+                
+
+                /* 基底渐变 */
+
+                linear-gradient(145deg, 
+
+                    #e1f0ff 0%, 
+
+                    #f0f8ff 100%);
+
+            
+
+            /* 兼容性处理 */
+
+            background: 
+
+                -webkit-radial-gradient(15% 15%, circle, 
+
+                    rgba(200, 230, 255, 0.9) 0%, 
+
+                    rgba(200, 230, 255, 0.6) 30%,
+
+                    transparent 60%),
+
+                -webkit-radial-gradient(85% 85%, ellipse, 
+
+                    rgba(240, 248, 255, 1) 0%, 
+
+                    rgba(224, 240, 255, 0.7) 40%,
+
+                    transparent 70%),
+
+                -webkit-radial-gradient(70% 50%, circle, 
+
+                    rgba(220, 240, 255, 0.8) 0%,
+
+                    transparent 50%),
+
+                -webkit-linear-gradient(145deg, #e1f0ff 0%, #f0f8ff 100%);
+
+                
+
+            background: 
+
+                -moz-radial-gradient(15% 15%, circle, 
+
+                    rgba(200, 230, 255, 0.9) 0%, 
+
+                    rgba(200, 230, 255, 0.6) 30%,
+
+                    transparent 60%),
+
+                -moz-radial-gradient(85% 85%, ellipse, 
+
+                    rgba(240, 248, 255, 1) 0%, 
+
+                    rgba(224, 240, 255, 0.7) 40%,
+
+                    transparent 70%),
+
+                -moz-radial-gradient(70% 50%, circle, 
+
+                    rgba(220, 240, 255, 0.8) 0%,
+
+                    transparent 50%),
+
+                -moz-linear-gradient(145deg, #e1f0ff 0%, #f0f8ff 100%);
+
+            padding: 20px;
+        }
+ 
+        #p5-container {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 300px;
+      height: 300px;
+      z-index: 100;
+      pointer-events: none; /* 允许鼠标事件穿透 */
+      display:none;
+    }
+        
+         canvas[data-p5-canvas] {
+      background-color: transparent !important;
+      mix-blend-mode: multiply; /* 使黑色文字更突出 */
+    }
+    
+    .chart-container {
+  /* 移除固定宽高，改用百分比和视口单位 */
+  width: 90%;
+  max-width: 95vw; /* 最大宽度为视口宽度的95% */
+  height: 50vh; /* 高度为视口高度的50% */
+  min-height: 300px; /* 最小高度保证在小屏幕上可读 */
+ 
+  margin: 40px auto; /* 减少上下边距 */
+  padding: 15px;
+  
+  background-color: transparent !important;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  
+  /* 确保容器为块级元素 */
+  display: block; /* 初始显示或根据需求用JS控制 */
+  
+  /* 弹性布局使图表居中 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  /* 防止内容溢出 */
+  overflow: hidden;
+  box-sizing: border-box; /* 包含padding在尺寸内 */
+}
+        
+        
+        
+        
+        
+        
+        
+        
+        .todo-app {
+            width: 100%;
+            max-width: 450px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            display: block;
+            
+        }
+
+ 
+ 
+        h1 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+ 
+        .input-area {
+            display: flex;
+            margin-bottom: 25px;
+        }
+
+        #a_button { 
+  
+    
+            /* 基础按钮样式（可选，根据需要调整） */ 
+ 
+            padding: 8px 16px; /* 内边距 */ 
+
+            border: none; /* 去除默认边框 */ 
+
+
+            border-radius: 4px; /* 圆角（可选） */ 
+
+            font-size: 14px; /* 字体大小 */ 
+
+            cursor: pointer; /* 鼠标悬停显示手型 */ 
+  
+
+            /* 核心：添加阴影效果 */ 
+
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* 水平偏移 0，垂直偏移 2px，模糊 5px，颜色半透明黑 */ 
+  
+
+            /* 可选：禁用状态下的阴影（更浅） */ 
+
+            &:disabled { 
+
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* 禁用时阴影变浅 */ 
+
+                cursor: not-allowed; /* 禁用时鼠标显示“禁止”图标 */ 
+
+            } 
+            &:not(:disabled):hover {
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); /* 悬停时阴影更大更明显 */ 
+
+            } 
+
+        } 
+
+ 
+        #new-task {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 12px 0 0 12px;
+            outline: none;
+            font-size: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            font-family: 'JDFXS', sans-serif !important;
+        }
+ 
+        #add-btn {
+            padding: 15px 20px;
+            background: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 0 12px 12px 0;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: background 0.3s;
+        }
+ 
+        #add-btn:hover {
+            background: #3182ce;
+        }
+ 
+        #task-list {
+            list-style: none;
+        }
+ 
+        .task-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.3s ease;
+        }
+ 
+        .task-item:last-child {
+            margin-bottom: 0;
+        }
+ 
+        .task-item input[type="checkbox"] {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+ 
+        .task-text {
+            flex: 1;
+            font-size: 16px;
+            color: #4a5568;
+            font-family: 'JDFXS', sans-serif !important;
+        }
+ 
+        .completed .task-text {
+            text-decoration: line-through;
+            color: #a0aec0;
+        }
+ 
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #e53e3e;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+            transition: transform 0.2s;
+        }
+
+        .task-item:last-child {
+
+            margin-bottom: 0;
+
+        }
+
+
+
+        .task-item input[type="checkbox"] {
+
+            margin-right: 15px;
+
+            width: 20px;
+
+            height: 20px;
+
+            cursor: pointer;
+
+        }
+
+
+
+        .task-text {
+
+            flex: 1;
+
+            font-size: 16px;
+
+            color: #4a5568;
+
+            font-family: 'JDFXS', sans-serif; /* 应用字体，后备为 sans-serif */
+
+    
+            font-size: 16px; /* 可选：调整字号 */
+
+        }
+
+
+
+        .completed .task-text {
+
+            text-decoration: line-through;
+
+            color: #a0aec0;
+
+        }
+
+
+
+        .delete-btn {
+
+            background: none;
+
+            border: none;
+
+            color: #e53e3e;
+
+            font-size: 18px;
+
+            cursor: pointer;
+
+            padding: 5px;
+
+            transition: transform 0.2s;
+
+        }
+
+
+
+        .delete-btn:hover {
+
+            transform: scale(1.1);
+
+        }
+
+
+
+        .fade-out {
+
+            opacity: 0;
+
+            transform: translateX(-20px);
+
+            transition: all 0.3s ease;
+
+        }
+
+
+
+        .guide {
+
+            position: absolute;
+
+            font-family: Arial, sans-serif;
+
+            color: #5a7a8a;
+
+            padding: 10px;
+
+            background: rgba(255,255,255,0.7);
+
+            border-radius: 5px;
+
+        }
+
+        .guide-1 { top: 15%; left: 15%; }
+
+        .guide-2 { bottom: 15%; right: 15%; }
+
+
+        @font-face {
+
+            font-family: 'JDFXS';
+              
+            src: url('09.TTF') format('truetype'); /* 使用正确的根目录路径 */
+            font-weight: normal;
+        
+            font-style: normal;
+
+            }
+             
+            
+        /* 应用到任务文本和输入框 */
+        .task-text, #new-task {
+            font-family: 'JDFXS', sans-serif;
+            font-size: 16px;
+        }
+
+        @keyframes fadeIn {
+
+            from {
+
+                opacity: 0;
+
+                transform: translateY(10px);
+
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+         @keyframes bounce { 
+ 
+            0%, 100% { transform: translateY(0); } 
+ 
+            50% { transform: translateY(-8px); } /* 向上跳动8px（可调整） */ 
+
+        } 
+    
+        #toggleButton { 
+  
+    
+    
+            animation: bounce 2s infinite ease-in-out; /* 2秒/次，无限循环 */ 
+        }
+
+        @media (min-width: 1024px) { 
+  .chart-container { 
+    width: 60%; /* 电脑端宽度占父容器60%，小于移动端 */ 
+    max-width: 800px; /* 限制电脑端最大宽度，避免过宽 */ 
+  }
+}
+        
+        /* 竖状浅蓝色 viewmore 按钮 */
+        #viewmoreBtn {
+  position: fixed; /* 将由脚本动态定位到容器右侧 */
+  background: #cfe9ff;
+  color: #1e3a5f;
+  border: 1px solid #a3c9f7;
+  border-radius: 10px;
+  padding: 12px 8px;
+  cursor: pointer;
+  writing-mode: vertical-rl; /* 竖排文字 */
+  text-orientation: mixed;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: none; /* 初始隐藏，图表显示时再显示 */
+}
+        #viewmoreBtn:hover { background: #b9dbff; }
+       
+    </style>
+</head>
+<body>
+      <!-- p5.js 容器 - 固定在左上角 -->
+  <div id="p5-container"></div>
+  
+  <!-- 3D饼图容器 -->
+  <div class="chart-container">
+    <canvas id="gradeChart"></canvas>
+    <!-- HTML：按钮 --> 
+    <button id="a_button" disabled>加载中...</button> <!-- 初始禁用，预加载完成后启用 --> 
+ 
+  
+  </div> 
+
+  
+    <!-- 竖状浅蓝色 viewmore 按钮（切换到图表时显示） -->
+    <button id="viewmoreBtn">viewmore</button>
+
+    <div id="realtime-clock" style="
+    
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(0,0,0,0.7);
+  padding: 10px 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(68, 59, 116, 0.15);
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+  opacity: 0.6;
+  filter: brightness(2px);
+">
+  <span id="current-time">00:00:00</span>
+</div>
+
+
+    
+
+    <div class="todo-app">
+        <h1>Todo List</h1>
+        <div class="input-area">
+            <input type="text" id="new-task" placeholder="Add a new task...">
+            <button id="add-btn">+</button>
+        </div>
+        <ul id="task-list"></ul>
+    </div>
+    
+    <button id="toggleButton" style=" 
+  
+  
+  position: fixed; /* 固定定位，相对于视口 */ 
+  left: 50%; /* 水平居中 */  
+  bottom: 20px; /* 距离底部20px（可调整） */ 
+  color: #39b398e8; /* 文字不透明 */ 
+  background: transparent; /* 背景透明 */ 
+  border: none; /* 边框透明 */ 
+  padding: 12px 24px; 
+  font-size: 18px; 
+  cursor: pointer; 
+  z-index: 1000; /* 确保在容器上方 */
+   ">999</button>
+
+    <script>
+
+        const style = document.createElement('style'); 
+
+        style.textContent  = `
+
+
+        @font-face {
+
+        font-family: 'JDFXS';
+
+        src: url('09.TTF') format('truetype'); /* 使用正确的根目录路径 */
+
+    }
+
+    .task-text, #new-task { font-family: 'JDFXS', sans-serif; }
+
+`;
+
+
+document.head.appendChild(style); 
+        // 删除重复的内联字体定义，避免冲突
+        // const style = document.createElement('style'); 
+        // style.textContent = ... 
+        // document.head.appendChild(style); 
+
+        // 任务数组初始化（从localStorage加载）
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+        // DOM元素
+        const taskInput = document.getElementById('new-task'); 
+        const addButton = document.getElementById('add-btn'); 
+        const taskList = document.getElementById('task-list'); 
+
+        // 初始化渲染
+        renderTasks();
+
+        // 添加任务
+        addButton.addEventListener('click', addTask);
+        taskInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+
+        function addTask() {
+            const taskText = taskInput.value.trim(); 
+            if (taskText) {
+                tasks.push({ text: taskText, completed: false });
+                saveTasks();
+                renderTasks();
+                taskInput.value = '';
+                taskInput.focus(); 
+            }
+        }
+
+        // 渲染任务列表（带动画）
+        function renderTasks() {
+            taskList.innerHTML = '';
+            tasks.forEach((task, index) => {
+                const li = document.createElement('li'); 
+                li.className = 'task-item';
+                if (task.completed) {
+                    li.classList.add('completed'); 
+                }
+                li.innerHTML = `
+                    <input type="checkbox" ${task.completed ? 'checked' : ''}>
+                    <span class="task-text">${task.text}</span> 
+                    <button class="delete-btn">✕</button>
+                `;
+                taskList.appendChild(li); 
+
+                // 事件绑定：删除任务
+                li.querySelector('.delete-btn').addEventListener('click', () => {
+                    li.classList.add('fade-out'); 
+                    setTimeout(() => {
+                        tasks.splice(index, 1);
+                        saveTasks();
+                        renderTasks();
+                    }, 300);
+                });
+
+                // 事件绑定：切换任务状态
+                li.querySelector('input').addEventListener('change', () => {
+                    task.completed = !task.completed; 
+                    li.classList.toggle('completed', task.completed); 
+                    saveTasks();
+                });
+            });
+        }
+
+        function updateClock() {
+            const now = new Date();
+            // 只提取时分秒并格式化为两位数
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            // 更新显示
+            document.getElementById('current-time').textContent = 
+            `${hours}:${minutes}:${seconds}`;
+        }
+
+        // 初始加载时显示时间
+         updateClock();
+
+         // 每秒更新一次
+         setInterval(updateClock, 1000);
+
+
+
+        // 保存到localStorage
+        function saveTasks() {
+            localStorage.setItem('tasks', JSON.stringify(tasks)); 
+        }
+
+        // 预加载图片并显示 
+
+        // 1. 预加载图片（支持多张）
+
+        let preloadedImages = [];
+        let currentImageIndex = 0;
+
+        const imageUrls = ['9.11.jpg', '9.12.jpg', '9.13.jpg']; // 可继续添加更多图片
+        const filteredImageUrls = imageUrls.filter(function(u){ return /^9\.[^/]*\.jpg$/i.test(u); });
+
+        const svgXCode = `
+
+        <svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
+  <defs>
+    <!-- 蓝白渐变定义 -->
+    <linearGradient id="blueWhiteGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4facfe" /> <!-- 浅蓝色 -->
+      <stop offset="100%" stop-color="#00f2fe" /> <!-- 亮蓝色 -->
+    </linearGradient>
+  </defs>
+  
+  <!-- 居中缩小的叉叉 -->
+  <text 
+    x="50" 
+    y="50" 
+    font-size="40" 
+    font-family="Arial, sans-serif" 
+    text-anchor="middle" 
+    dominant-baseline="middle" 
+    fill="url(#blueWhiteGradient)">×
+  </text>
+</svg>
+        
+   
+        
+             `;
+        
+        
+
+            // 你的 SVG 叉号代码（可替换为实际内容）
+
+
+                document.addEventListener('DOMContentLoaded',  function() {
+  
+                    const button = document.getElementById('a_button'); 
+                    let finishedCount = 0;
+                    let successCount = 0;
+
+                    filteredImageUrls.forEach((url) => {
+                        const img = new Image();
+                        img.src = url;
+                        img.onload = function() {
+                            preloadedImages.push(img);
+                            successCount += 1;
+                            finishedCount += 1;
+                            if (successCount === 1) {
+                                button.disabled = false;
+                                button.textContent = '点击显示图片';
+                            }
+                            if (finishedCount === filteredImageUrls.length && successCount === 0) {
+                                button.textContent = '加载失败';
+                            }
+                        };
+                        img.onerror = function() {
+                            finishedCount += 1;
+                            if (finishedCount === filteredImageUrls.length && successCount === 0) {
+                                console.error(' 图片预加载失败');
+                                button.textContent = '加载失败';
+                            }
+                        };
+                    });
+  
+                });
+
+
+                // 2. 点击按钮显示容器（包含 SVG 叉号和图片）
+
+                document.getElementById('a_button').addEventListener('click',  function() {
+ 
+                    if (!filteredImageUrls || filteredImageUrls.length === 0) return;
+
+
+                    // 创建外层容器（黑色背景）
+ 
+ 
+                    const container = document.createElement('div'); 
+ 
+                    container.style.cssText  = `
+ 
+                    position: fixed;
+                
+                    top: 0;
+                 
+                    left: 0;
+                    width: 100%; 
+                    height: 100%;
+  
+                    display: flex;
+                     justify-content: center; 
+                     align-items: center;
+ 
+                    background: rgba(0,0,0,0.7); 
+                    z-index: 9999; opacity: 0;
+
+   
+                    transition: opacity 0.3s;
+                     border-radius: 1px;
+ 
+                    `;
+
+  
+                    // 创建“叉号+图片”的横向容器（flex 布局）
+  
+                    const contentWrapper = document.createElement('div'); 
+  
+                    contentWrapper.style.cssText  = `
+  
+                    display: flex; align-items: center; gap: 20px; /* 叉号和图片间距 */
+ 
+                    `;
+
+  
+                    // 创建 SVG 叉号元素
+ 
+                    const svgX = document.createElement('div'); 
+  
+  
+                    svgX.innerHTML  = svgXCode; // 插入 SVG 代码
+
+                    svgX.style.cursor  = 'pointer'; // 鼠标悬停显示手型（可选：点击叉号关闭）
+
+ 
+                    // 创建图片元素（使用预加载的图片）
+ 
+                    currentImageIndex = 0;
+                    const img = new Image();
+                    img.src = filteredImageUrls[currentImageIndex];
+ 
+                    img.style.cssText  = `
+  
+                    max-width: 80vw; max-height: 80vh;
+  
+                    width: auto; height: auto; border-radius: 16px;
+ 
+                    `;
+
+ 
+                    // 创建“下一张”按钮
+                    const nextBtn = document.createElement('button');
+                    nextBtn.textContent = '>';
+                    nextBtn.style.cssText = `
+                    font-size: 28px; color: #fff; background: rgba(255,255,255,0.15);
+                    border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 8px 14px;
+                    cursor: pointer; backdrop-filter: blur(3px);
+                    `;
+
+                    if (filteredImageUrls.length <= 1) {
+                        nextBtn.disabled = true;
+                        nextBtn.style.opacity = '0.5';
+                        nextBtn.style.cursor = 'default';
+                    }
+
+                    nextBtn.addEventListener('click', function() {
+                        if (currentImageIndex < filteredImageUrls.length - 1) {
+                            currentImageIndex += 1;
+                            img.src = filteredImageUrls[currentImageIndex];
+                            if (currentImageIndex === filteredImageUrls.length - 1) {
+                                nextBtn.disabled = true;
+                                nextBtn.style.opacity = '0.5';
+                                nextBtn.style.cursor = 'default';
+                            }
+                        }
+                    });
+
+                    // 将叉号、图片和“下一张”按钮添加到横向容器
+ 
+                    contentWrapper.appendChild(svgX); 
+ 
+                    contentWrapper.appendChild(img); 
+                    contentWrapper.appendChild(nextBtn); 
+  
+                    container.appendChild(contentWrapper); 
+  
+                    document.body.appendChild(container); 
+
+
+                    // 淡入显示
+ 
+                    setTimeout(() => container.style.opacity  = '1', 10);
+
+ 
+                    // 可选：点击叉号关闭容器
+  
+                    svgX.addEventListener('click',  () => {
+   
+                        container.style.opacity  = '0';
+  
+                        setTimeout(() => container.remove(),  300);
+ 
+                    });
+
+ 
+                    // 点击背景关闭容器deled
+
+                });
+  
+
+                 const toggleButton = document.getElementById('toggleButton');  
+const todoApp = document.querySelector('.todo-app');  
+const chartContainer = document.querySelector('.chart-container');  
+                // 初始状态：显示Todo，隐藏图表 
+let isTodoVisible = true; 
+chartContainer.style.display  = 'none'; 
+ 
+// 确保容器初始居中（覆盖可能的原有样式） 
+todoApp.style.position  = 'absolute'; 
+todoApp.style.top  = '50%'; 
+todoApp.style.left  = '50%'; 
+todoApp.style.transform  = 'translate(-50%, -50%)'; 
+chartContainer.style.position  = 'absolute'; 
+chartContainer.style.top  = '50%'; 
+chartContainer.style.left  = '50%'; 
+chartContainer.style.transform  = 'translate(-50%, -50%)'; 
+ 
+// 处理 viewmore 按钮与 p5 容器显隐与定位
+const viewmoreBtn = document.getElementById('viewmoreBtn');
+const p5Container = document.getElementById('p5-container');
+
+function positionViewmore() {
+  const target = (todoApp.style.display !== 'none') ? todoApp : chartContainer;
+  const rect = target.getBoundingClientRect();
+  const btnRect = viewmoreBtn.getBoundingClientRect();
+  // 贴紧容器右侧，垂直居中
+  const left = rect.right + 10; // 右侧间距 10px
+  const top = rect.top + (rect.height - btnRect.height) / 2;
+  viewmoreBtn.style.left = left + 'px';
+  viewmoreBtn.style.top = top + 'px';
+}
+
+// 初始：显示按钮并定位（默认先贴 todolist）
+viewmoreBtn.style.display = 'block';
+setTimeout(positionViewmore, 0);
+
+// 点击 viewmore：切换 p5 显示隐藏
+viewmoreBtn.addEventListener('click', function() {
+  if (p5Container.style.display === 'none' || p5Container.style.display === '') {
+    p5Container.style.display = 'block';
+  } else {
+    p5Container.style.display = 'none';
+  }
+});
+
+// 窗口尺寸变化时，重新定位按钮
+window.addEventListener('resize', positionViewmore);
+
+// 按钮点击切换逻辑 
+toggleButton.addEventListener('click',  function() { 
+  if (isTodoVisible) { 
+    // 显示图表，隐藏Todo 
+    todoApp.style.display  = 'none'; 
+    chartContainer.style.display  = 'block'; 
+    viewmoreBtn.style.display = 'block';
+  } else { 
+    // 显示Todo，隐藏图表 
+    chartContainer.style.display  = 'none'; 
+    todoApp.style.display  = 'block'; 
+    viewmoreBtn.style.display = 'block';
+    p5Container.style.display = 'none';
+  } 
+  isTodoVisible = !isTodoVisible; 
+  // 根据当前可见页面更新按钮文本
+  toggleButton.textContent = isTodoVisible ? 'page1' : 'page2'; 
+  // 切换后重新定位 viewmore
+  setTimeout(positionViewmore, 0);
+}); 
+
+
+        
+
+
+        // ============== 完整保留的p5.js 代码 ==============
+
+        let textToWrite = "唐嘉翎";
+
+        let SEGMENTS = 200;
+
+        let PI = 3.1415926;
+
+        let TWO_PI = PI * 2;
+   
+
+        class Point {
+  
+            constructor(x, y) {
+  
+                this.x = x;
+  
+                this.y = y;
+ 
+            }
+
+        }
+
+
+        function setup() {
+  
+            // 创建画布时指定到p5-container元素中
+  
+            let canvas = createCanvas(300, 300);
+  
+            canvas.parent('p5-container'); 
+  
+
+  
+            centerX = width / 2;
+  
+            centerY = height / 2;
+  
+ 
+            let screenPct = min(height, width) / 1000;
+ 
+            fontSize = screenPct * 150;
+ 
+            INNER_RADIUS = screenPct * 200;
+ 
+            RADIUS_VARIATION = screenPct * 200;
+  
+  
+            textFont("Helvetica");
+ 
+            textSize(fontSize);
+  
+ 
+            // 设置透明背景
+ 
+ 
+            background(0, 0);
+
+        }
+
+
+        function pointForIndex(pct) {
+  
+            const NOISE_SCALE = 1.5;
+ 
+            let angle = pct * TWO_PI;
+  
+            let cosAngle = cos(angle);
+ 
+ 
+  
+            let sinAngle = sin(angle);
+ 
+            let time = frameCount / 100;
+ 
+            let noiseValue = noise(NOISE_SCALE * cosAngle + NOISE_SCALE, 
+  
+            NOISE_SCALE * sinAngle + NOISE_SCALE, 
+   
+            time);
+
+            let radius = INNER_RADIUS + RADIUS_VARIATION * noiseValue;
+  
+            return new Point(radius * cosAngle + centerX, radius * sinAngle + centerY);
+
+  
+        }
+
+
+  
+        function draw() {
+  
+            // 清除画布但保持透明
+  
+            clear();
+  
+  
+            fill(0); // 只保留黑色文字
+ 
+            noStroke();
+  
+ 
+            beginShape();
+ 
+
+            for (let i = 0; i < SEGMENTS; i++) {
+  
+                let p0 = pointForIndex(i / SEGMENTS);
+  
+  
+                vertex(p0.x, p0.y);
+ 
+
+
+            }
+ 
+            endShape(CLOSE);
+
+
+            let pct = atan2(mouseY - centerY, mouseX - centerX) / TWO_PI;
+ 
+            let pixToAngularPct = 1 / ((INNER_RADIUS + RADIUS_VARIATION / 2) * TWO_PI);
+
+
+
+            for (let textChar of textToWrite) {
+   
+                let charWidth = textWidth(textChar);
+  
+                pct += charWidth/2 * pixToAngularPct;
+  
+    
+  
+                let leftP = pointForIndex(pct-0.01);
+   
+                let rightP = pointForIndex(pct+0.01);
+   
+                let angle = atan2(leftP.y - rightP.y, leftP.x - rightP.x) + PI;
+    
+  
+                push();
+ 
+                let point = pointForIndex(pct);
+  
+                translate(point.x, point.y);
+   
+                rotate(angle);
+  
+                translate(-point.x, -point.y);
+  
+                text(textChar, point.x-charWidth/2, point.y);
+ 
+                pop();
+    
+
+                pct += charWidth/2 * pixToAngularPct;
+
+            }
+
+        }
+
+
+
+
+        // ============== p5.js 代码结束 ==============
+
+
+
+        // 3D饼图配置
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+  
+            const ctx = document.getElementById('gradeChart').getContext('2d'); 
+  
+  
+            // 模拟成绩数据
+  
+            const gradeData = {
+   
+                labels: ['语文', '数学', '英语', '政治', '历史', '地理', '生物', '化学'],
+    
+                datasets: [{
+    
+                    data: [102, 86, 88, 76, 82, 79, 91, 84],
+    
+                    backgroundColor: [
+   
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+  
+                    '#9966FF', '#FF9F40', '#8AC249', '#EA5545'
+   
+                ],
+  
+                borderWidth: 1,
+  
+                borderColor: '#fff',
+   
+                hoverBorderWidth: 2,
+  
+ 
+            }]
+  
+        };
+
+  
+        // 创建3D效果的饼图
+ 
+        new Chart(ctx, {
+  
+            type: 'pie',
+   
+            data: gradeData,
+   
+            options: {
+  
+                responsive: true,
+                maintainAspectRatio:false,
+  
+                plugins: {
+   
+    
+                    legend: {
+   
+                        position: 'top',
+   
+                    },
+   
+                    title: {
+  
+                        display: true,
+  
+                        text: '唐嘉翎2025开学考各科成绩分布',
+  
+                        font: {
+  
+                            size: 18
+  
+                        }
+  
+                    },
+  
+                    // 使用datalabels插件显示百分比
+  
+                    datalabels: {
+  
+                        formatter: (value, ctx) => {
+  
+                            const sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+  
+                            const percentage = (value * 100 / sum).toFixed(1) + '%';
+  
+                            return percentage;
+  
+                        },
+  
+                        color: '#fff',
+  
+                        font: {
+  
+                            weight: 'bold'
+   
+                        }
+   
+                    },
+   
+                    // 添加3D阴影效果
+   
+   
+                    shadow: {
+   
+                        enabled: true,
+   
+                        color: 'rgba(0,0,0,0.3)',
+   
+                        blur: 10,
+   
+                        offsetX: 3,
+   
+                        offsetY: 3
+   
+                    }
+   
+                },
+   
+                // 3D效果设置
+   
+                cutout: '60%',
+   
+                rotation: -30,
+   
+                circumference: 250,
+   
+                animation: {
+   
+                    animateScale: true,
+   
+                    animateRotate: true
+
+                }
+   
+            },
+   
+            plugins: [ChartDataLabels]
+ 
+        }
+
+    );
+
+});
+
+</script>
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
