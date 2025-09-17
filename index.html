@@ -867,9 +867,7 @@ document.head.appendChild(style);
 
         // 1. 预加载图片（自动探测 9.11~9.99，支持 .jpg/.JPG）
 
-        let preloadedImages = [];
-        let currentImageIndex = 0;
-        let availableImageUrls = [];
+        
 
         const svgXCode = `
 
@@ -897,188 +895,212 @@ document.head.appendChild(style);
    
         
              `;
-        
-        
-
-            // 你的 SVG 叉号代码（可替换为实际内容）
-
-
-                document.addEventListener('DOMContentLoaded',  function() {
-  
-                    const button = document.getElementById('a_button'); 
-                    let finishedCount = 0;
-                    let successCount = 0;
-
-                    const candidateNumbers = Array.from({ length: 89 }, function(_, i) { return i + 11; });
-                    const candidateUrls = [];
-                    candidateNumbers.forEach(function(n){
-                        candidateUrls.push('9.' + n + '.jpg');
-                        candidateUrls.push('9.' + n + '.JPG');
-                    });
-
-                    const totalCandidates = candidateUrls.length;
-                    if (totalCandidates === 0) {
-                        button.textContent = '加载失败';
-                        return;
-                    }
-
-                    candidateUrls.forEach(function(url){
-                        const img = new Image();
-                        img.onload = function() {
-                            preloadedImages.push(img);
-                            if (availableImageUrls.indexOf(url) === -1) {
-                                availableImageUrls.push(url);
-                            }
-                            successCount += 1;
-                            finishedCount += 1;
-                            if (successCount === 1) {
-                                button.disabled = false;
-                                button.textContent = '点击显示图片';
-                            }
-                        };
-                        img.onerror = function() {
-                            finishedCount += 1;
-                            if (finishedCount === totalCandidates && successCount === 0) {
-                                console.error(' 图片预加载失败');
-                                button.textContent = '加载失败';
-                            }
-                        };
-                        img.src = url;
-                    });
-  
-                });
-
-
-                // 2. 点击按钮显示容器（包含 SVG 叉号和图片）
-
-                document.getElementById('a_button').addEventListener('click',  function() {
+// 1. 预加载图片（自动探测 9.11~9.99，支持 .jpg/.JPG）
+let preloadedImages = [];
+let currentImageIndex = 0;
+let availableImageUrls = [];
  
-                    if (!availableImageUrls || availableImageUrls.length === 0) return;
-
-
-                    // 创建外层容器（黑色背景）
+document.addEventListener('DOMContentLoaded',  function() {
+    const button = document.getElementById('a_button');  
+    let finishedCount = 0;
+    let successCount = 0;
  
+    // 生成候选图片URL 
+    const candidateNumbers = Array.from({  length: 89 }, (_, i) => (i + 11).toString().padStart(2, '0'));
+    const candidateUrls = candidateNumbers.flatMap(n  => [`9.${n}.jpg`, `9.${n}.JPG`]);
  
-                    const container = document.createElement('div'); 
+    const totalCandidates = candidateUrls.length; 
+    if (totalCandidates === 0) {
+        button.textContent  = '加载失败';
+        return;
+    }
  
-                    container.style.cssText  = `
+    // 预加载图片
+    const loadImage = (url) => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload  = () => {
+                preloadedImages.push(img); 
+                if (!availableImageUrls.includes(url))  {
+                    availableImageUrls.push(url); 
+                }
+                successCount++;
+                resolve(true);
+            };
+            img.onerror  = () => {
+                resolve(false);
+            };
+            img.src  = url;
+        });
+    };
  
-                    position: fixed;
+    // 并行预加载所有图片
+    Promise.all(candidateUrls.map(loadImage)).then(results  => {
+        finishedCount = results.length; 
+        successCount = results.filter(Boolean).length; 
+ 
+        if (successCount > 0) {
+            button.disabled  = false;
+            button.textContent  = '点击显示图片';
+        } else {
+            console.error(' 图片预加载失败');
+            button.textContent  = '加载失败';
+        }
+    });
+ 
+    // 2. 点击按钮显示图片查看器 
+    button.addEventListener('click',  function() {
+        if (!availableImageUrls || availableImageUrls.length  === 0) return;
+ 
+        // 创建外层容器（黑色背景）
+        const container = document.createElement('div');  
+        container.style.cssText  = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%; 
+            height: 100%;
+            display: flex;
+            justify-content: center; 
+            align-items: center;
+            background: rgba(0,0,0,0.85); 
+            z-index: 9999; 
+            opacity: 0;
+            transition: opacity 0.3s;
+        `;
+ 
+        // 创建内容包装器
+        const contentWrapper = document.createElement('div');  
+        contentWrapper.style.cssText  = `
+            display: flex; 
+            align-items: center; 
+            gap: 20px;
+            position: relative;
+        `;
+ 
+        // 创建关闭按钮
+        const closeBtn = document.createElement('div');  
+        closeBtn.innerHTML  = svgXCode;
+        closeBtn.style.cssText  = `
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%;
+            padding: 8px;
+            backdrop-filter: blur(3px);
+        `;
+ 
+        // 创建图片元素 
+        const img = new Image();
+        img.src  = availableImageUrls[currentImageIndex];
+        img.style.cssText  = `
+            max-width: 80vw; 
+            max-height: 80vh;
+            width: auto; 
+            height: auto; 
+            border-radius: 16px;
+            object-fit: contain;
+        `;
+        img.onerror  = () => console.error(' 图片加载失败');
+ 
+        // 创建导航按钮 
+        const createNavButton = (text, disabled) => {
+            const btn = document.createElement('button'); 
+            btn.textContent  = text;
+            btn.style.cssText  = `
+                font-size: 28px; 
+                color: #fff; 
+                background: rgba(255,255,255,0.15);
+                border: 1px solid rgba(255,255,255,0.3); 
+                border-radius: 8px; 
+                padding: 8px 14px;
+                cursor: pointer; 
+                backdrop-filter: blur(3px);
+                transition: opacity 0.2s;
+            `;
+            if (disabled) {
+                btn.disabled  = true;
+                btn.style.opacity  = '0.5';
+                btn.style.cursor  = 'default';
+            }
+            return btn;
+        };
+ 
+        const prevBtn = createNavButton('<', currentImageIndex === 0);
+        const nextBtn = createNavButton('>', currentImageIndex === availableImageUrls.length  - 1);
+ 
+        // 导航功能 
+        const navigate = (direction) => {
+            const newIndex = currentImageIndex + direction;
+            if (newIndex >= 0 && newIndex < availableImageUrls.length)  {
+                currentImageIndex = newIndex;
+                img.src  = availableImageUrls[currentImageIndex];
                 
-                    top: 0;
-                 
-                    left: 0;
-                    width: 100%; 
-                    height: 100%;
-  
-                    display: flex;
-                     justify-content: center; 
-                     align-items: center;
- 
-                    background: rgba(0,0,0,0.7); 
-                    z-index: 9999; opacity: 0;
-
-   
-                    transition: opacity 0.3s;
-                     border-radius: 1px;
- 
-                    `;
-
-  
-                    // 创建“叉号+图片”的横向容器（flex 布局）
-  
-                    const contentWrapper = document.createElement('div'); 
-  
-                    contentWrapper.style.cssText  = `
-  
-                    display: flex; align-items: center; gap: 20px; /* 叉号和图片间距 */
- 
-                    `;
-
-  
-                    // 创建 SVG 叉号元素
- 
-                    const svgX = document.createElement('div'); 
-  
-  
-                    svgX.innerHTML  = svgXCode; // 插入 SVG 代码
-
-                    svgX.style.cursor  = 'pointer'; // 鼠标悬停显示手型（可选：点击叉号关闭）
-
- 
-                    // 创建图片元素（使用预加载的图片）
- 
-                    currentImageIndex = 0;
-                    const img = new Image();
-                    img.src = availableImageUrls[currentImageIndex];
- 
-                    img.style.cssText  = `
-  
-                    max-width: 80vw; max-height: 80vh;
-  
-                    width: auto; height: auto; border-radius: 16px;
- 
-                    `;
-
- 
-                    // 创建“下一张”按钮
-                    const nextBtn = document.createElement('button');
-                    nextBtn.textContent = '>';
-                    nextBtn.style.cssText = `
-                    font-size: 28px; color: #fff; background: rgba(255,255,255,0.15);
-                    border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 8px 14px;
-                    cursor: pointer; backdrop-filter: blur(3px);
-                    `;
-
-                    if (availableImageUrls.length <= 1) {
-                        nextBtn.disabled = true;
-                        nextBtn.style.opacity = '0.5';
-                        nextBtn.style.cursor = 'default';
-                    }
-
-                    nextBtn.addEventListener('click', function() {
-                        if (currentImageIndex < availableImageUrls.length - 1) {
-                            currentImageIndex += 1;
-                            img.src = availableImageUrls[currentImageIndex];
-                            if (currentImageIndex === availableImageUrls.length - 1) {
-                                nextBtn.disabled = true;
-                                nextBtn.style.opacity = '0.5';
-                                nextBtn.style.cursor = 'default';
-                            }
-                        }
-                    });
-
-                    // 将叉号、图片和“下一张”按钮添加到横向容器
- 
-                    contentWrapper.appendChild(svgX); 
- 
-                    contentWrapper.appendChild(img); 
-                    contentWrapper.appendChild(nextBtn); 
-  
-                    container.appendChild(contentWrapper); 
-  
-                    document.body.appendChild(container); 
-
-
-                    // 淡入显示
- 
-                    setTimeout(() => container.style.opacity  = '1', 10);
-
- 
-                    // 可选：点击叉号关闭容器
-  
-                    svgX.addEventListener('click',  () => {
-   
-                        container.style.opacity  = '0';
-  
-                        setTimeout(() => container.remove(),  300);
- 
-                    });
-
- 
-                    // 点击背景关闭容器deled
-
+                // 更新按钮状态
+                prevBtn.disabled  = currentImageIndex === 0;
+                nextBtn.disabled  = currentImageIndex === availableImageUrls.length  - 1;
+                
+                [prevBtn, nextBtn].forEach(btn => {
+                    btn.style.opacity  = btn.disabled  ? '0.5' : '1';
+                    btn.style.cursor  = btn.disabled  ? 'default' : 'pointer';
                 });
+            }
+        };
+ 
+        // 添加事件监听 
+        prevBtn.addEventListener('click',  () => navigate(-1));
+        nextBtn.addEventListener('click',  () => navigate(1));
+ 
+        // 键盘导航 
+        const handleKeyDown = (e) => {
+            switch (e.key)  {
+                case 'ArrowLeft':
+                    if (!prevBtn.disabled)  navigate(-1);
+                    break;
+                case 'ArrowRight':
+                    if (!nextBtn.disabled)  navigate(1);
+                    break;
+                case 'Escape':
+                    closeViewer();
+                    break;
+            }
+        };
+        document.addEventListener('keydown',  handleKeyDown);
+ 
+        // 关闭查看器
+        const closeViewer = () => {
+            container.style.opacity  = '0';
+            document.removeEventListener('keydown',  handleKeyDown);
+            setTimeout(() => container.remove(),  300);
+        };
+ 
+        // 组装DOM
+        contentWrapper.appendChild(closeBtn); 
+        contentWrapper.appendChild(prevBtn); 
+        contentWrapper.appendChild(img); 
+        contentWrapper.appendChild(nextBtn); 
+        container.appendChild(contentWrapper); 
+        document.body.appendChild(container); 
+ 
+        // 淡入显示 
+        setTimeout(() => container.style.opacity  = '1', 10);
+ 
+        // 添加关闭事件
+        closeBtn.addEventListener('click',  closeViewer);
+        container.addEventListener('click',  (e) => {
+            if (e.target  === container) {
+                closeViewer();
+            }
+        });
+    });
+});
+
+  
+                    
   
 
                  const toggleButton = document.getElementById('toggleButton');  
@@ -1703,6 +1725,7 @@ renderMusicList('');
 </body>
 
 </html>
+
 
 
 
