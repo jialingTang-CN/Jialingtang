@@ -1,0 +1,1931 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script> 
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script> 
+ 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>唐嘉翎's TodoList</title>
+    <style>
+        @font-face {
+            font-family: 'JDFXS';
+            src: url('09.TTF') format('truetype'), url('09.woff2') format('woff2'); 
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+ 
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: 
+
+                /* 左上角明显渐变 */
+
+                radial-gradient(circle at 15% 15%, 
+
+                    rgba(200, 230, 255, 0.9) 0%, 
+
+                    rgba(200, 230, 255, 0.6) 30%,
+
+                    transparent 60%),
+
+                
+
+                /* 右下角明显渐变 */
+
+                radial-gradient(ellipse at 85% 85%, 
+
+                    rgba(240, 248, 255, 1) 0%, 
+
+                    rgba(224, 240, 255, 0.7) 40%,
+
+                    transparent 70%),
+
+                
+
+                /* 中间右侧辅助渐变 */
+
+                radial-gradient(circle at 70% 50%, 
+
+                    rgba(220, 240, 255, 0.8) 0%,
+
+                    transparent 50%),
+
+                
+
+                /* 基底渐变 */
+
+                linear-gradient(145deg, 
+
+                    #e1f0ff 0%, 
+
+                    #f0f8ff 100%);
+
+            
+
+            /* 兼容性处理 */
+
+            background: 
+
+                -webkit-radial-gradient(15% 15%, circle, 
+
+                    rgba(200, 230, 255, 0.9) 0%, 
+
+                    rgba(200, 230, 255, 0.6) 30%,
+
+                    transparent 60%),
+
+                -webkit-radial-gradient(85% 85%, ellipse, 
+
+                    rgba(240, 248, 255, 1) 0%, 
+
+                    rgba(224, 240, 255, 0.7) 40%,
+
+                    transparent 70%),
+
+                -webkit-radial-gradient(70% 50%, circle, 
+
+                    rgba(220, 240, 255, 0.8) 0%,
+
+                    transparent 50%),
+
+                -webkit-linear-gradient(145deg, #e1f0ff 0%, #f0f8ff 100%);
+
+                
+
+            background: 
+
+                -moz-radial-gradient(15% 15%, circle, 
+
+                    rgba(200, 230, 255, 0.9) 0%, 
+
+                    rgba(200, 230, 255, 0.6) 30%,
+
+                    transparent 60%),
+
+                -moz-radial-gradient(85% 85%, ellipse, 
+
+                    rgba(240, 248, 255, 1) 0%, 
+
+                    rgba(224, 240, 255, 0.7) 40%,
+
+                    transparent 70%),
+
+                -moz-radial-gradient(70% 50%, circle, 
+
+                    rgba(220, 240, 255, 0.8) 0%,
+
+                    transparent 50%),
+
+                -moz-linear-gradient(145deg, #e1f0ff 0%, #f0f8ff 100%);
+
+            padding: 20px;
+        }
+ 
+        #p5-container {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 300px;
+      height: 300px;
+      z-index: 100;
+      pointer-events: none; /* 允许鼠标事件穿透 */
+      display:none;
+    }
+        
+         canvas[data-p5-canvas] {
+      background-color: transparent !important;
+      mix-blend-mode: multiply; /* 使黑色文字更突出 */
+    }
+    
+    .chart-container {
+  /* 移除固定宽高，改用百分比和视口单位 */
+  width: 90%;
+  max-width: 95vw; /* 最大宽度为视口宽度的95% */
+  height: 50vh; /* 高度为视口高度的50% */
+  min-height: 300px; /* 最小高度保证在小屏幕上可读 */
+ 
+  margin: 40px auto; /* 减少上下边距 */
+  padding: 15px;
+  
+  background-color: transparent !important;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  
+  /* 确保容器为块级元素 */
+  display: block; /* 初始显示或根据需求用JS控制 */
+  
+  /* 弹性布局使图表居中 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  /* 防止内容溢出 */
+  overflow: hidden;
+  box-sizing: border-box; /* 包含padding在尺寸内 */
+}
+    /* 移动端优化图表尺寸（宽度更窄、高度更低） */
+    @media (max-width: 640px) {
+      .chart-container {
+        width: 92%;
+        height: 38vh;
+        min-height: 220px;
+      }
+}
+        
+        
+        
+        
+        
+        
+        
+        
+        .todo-app {
+            width: 100%;
+            max-width: 450px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            display: block;
+            
+        }
+
+ 
+ 
+        h1 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+ 
+        .input-area {
+            display: flex;
+            margin-bottom: 25px;
+        }
+
+        #a_button { 
+  
+    
+            /* 基础按钮样式（可选，根据需要调整） */ 
+ 
+            padding: 8px 16px; /* 内边距 */ 
+
+            border: none; /* 去除默认边框 */ 
+
+
+            border-radius: 4px; /* 圆角（可选） */ 
+
+            font-size: 14px; /* 字体大小 */ 
+
+            cursor: pointer; /* 鼠标悬停显示手型 */ 
+  
+
+            /* 核心：添加阴影效果 */ 
+
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* 水平偏移 0，垂直偏移 2px，模糊 5px，颜色半透明黑 */ 
+  
+
+            /* 可选：禁用状态下的阴影（更浅） */ 
+
+            &:disabled { 
+
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* 禁用时阴影变浅 */ 
+
+                cursor: not-allowed; /* 禁用时鼠标显示“禁止”图标 */ 
+
+            } 
+            &:not(:disabled):hover {
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); /* 悬停时阴影更大更明显 */ 
+
+            } 
+
+        } 
+
+ 
+        #new-task {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 12px 0 0 12px;
+            outline: none;
+            font-size: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            font-family: 'JDFXS', sans-serif !important;
+        }
+ 
+        #add-btn {
+            padding: 15px 20px;
+            background: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 0 12px 12px 0;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: background 0.3s;
+        }
+ 
+        #add-btn:hover {
+            background: #3182ce;
+        }
+ 
+        #task-list {
+            list-style: none;
+        }
+ 
+        .task-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.3s ease;
+        }
+ 
+        .task-item:last-child {
+            margin-bottom: 0;
+        }
+ 
+        .task-item input[type="checkbox"] {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+ 
+        .task-text {
+            flex: 1;
+            font-size: 16px;
+            color: #4a5568;
+            font-family: 'JDFXS', sans-serif !important;
+        }
+ 
+        .completed .task-text {
+            text-decoration: line-through;
+            color: #a0aec0;
+        }
+ 
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #e53e3e;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+            transition: transform 0.2s;
+        }
+
+        .task-item:last-child {
+
+            margin-bottom: 0;
+
+        }
+
+
+
+        .task-item input[type="checkbox"] {
+
+            margin-right: 15px;
+
+            width: 20px;
+
+            height: 20px;
+
+            cursor: pointer;
+
+        }
+
+
+
+        .task-text {
+
+            flex: 1;
+
+            font-size: 16px;
+
+            color: #4a5568;
+
+            font-family: 'JDFXS', sans-serif; /* 应用字体，后备为 sans-serif */
+
+    
+            font-size: 16px; /* 可选：调整字号 */
+
+        }
+
+
+
+        .completed .task-text {
+
+            text-decoration: line-through;
+
+            color: #a0aec0;
+
+        }
+
+
+
+        .delete-btn {
+
+            background: none;
+
+            border: none;
+
+            color: #e53e3e;
+
+            font-size: 18px;
+
+            cursor: pointer;
+
+            padding: 5px;
+
+            transition: transform 0.2s;
+
+        }
+
+
+
+        .delete-btn:hover {
+
+            transform: scale(1.1);
+
+        }
+
+        .detail-btn {
+            background: none;
+            border: none;
+            color: #3182ce;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 5px 8px;
+            margin-right: 6px;
+        }
+
+        /* 详情弹窗样式与动画 */
+        .detail-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            animation: overlayFade 200ms ease forwards;
+        }
+
+        @keyframes overlayFade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .detail-modal {
+            width: 320px;
+            height: 320px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.18);
+            position: relative;
+            transform: scale(0.9);
+            opacity: 0;
+            animation: modalIn 220ms cubic-bezier(.2,.8,.2,1) forwards;
+            overflow: hidden;
+        }
+
+        @keyframes modalIn {
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .detail-header {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .detail-edit-btn {
+            background: none;
+            border: none;
+            color: #2b6cb0;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 6px 8px;
+        }
+
+        .detail-save-btn {
+            background: #38a169;
+            border: none;
+            color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            padding: 6px 10px;
+            font-weight: 600;
+        }
+
+        .detail-content {
+            position: absolute;
+            left: 16px;
+            right: 16px;
+            top: 48px;
+            bottom: 16px;
+            border: 1px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 12px;
+            overflow: auto;
+            color: #334155;
+            background: #f8fafc;
+        }
+
+        .detail-textarea {
+            width: 100%;
+            height: 100%;
+            border: none;
+            outline: none;
+            resize: none;
+            background: transparent;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #1f2937;
+        }
+
+
+
+        .fade-out {
+
+            opacity: 0;
+
+            transform: translateX(-20px);
+
+            transition: all 0.3s ease;
+
+        }
+
+
+
+        .guide {
+
+            position: absolute;
+
+            font-family: Arial, sans-serif;
+
+            color: #5a7a8a;
+
+            padding: 10px;
+
+            background: rgba(255,255,255,0.7);
+
+            border-radius: 5px;
+
+        }
+
+        .guide-1 { top: 15%; left: 15%; }
+
+        .guide-2 { bottom: 15%; right: 15%; }
+
+
+        @font-face {
+
+            font-family: 'JDFXS';
+              
+            src: url('09.TTF') format('truetype'); /* 使用正确的根目录路径 */
+            font-weight: normal;
+        
+            font-style: normal;
+
+            }
+             
+            
+        /* 应用到任务文本和输入框 */
+        .task-text, #new-task {
+            font-family: 'JDFXS', sans-serif;
+            font-size: 16px;
+        }
+
+        @keyframes fadeIn {
+
+            from {
+
+                opacity: 0;
+
+                transform: translateY(10px);
+
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+         @keyframes bounce { 
+ 
+            0%, 100% { transform: translateY(0); } 
+ 
+            50% { transform: translateY(-8px); } /* 向上跳动8px（可调整） */ 
+
+        } 
+    
+        #toggleButton { 
+  
+    
+    
+            animation: bounce 2s infinite ease-in-out; /* 2秒/次，无限循环 */ 
+        }
+
+        @media (min-width: 1024px) { 
+  .chart-container { 
+    width: 60%; /* 电脑端宽度占父容器60%，小于移动端 */ 
+    max-width: 800px; /* 限制电脑端最大宽度，避免过宽 */ 
+  }
+}
+
+        /* 钢琴进度动画 */
+        @keyframes press { 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(6px);} }
+        
+        /* 竖状浅蓝色 viewmore 按钮 */
+        #viewmoreBtn {
+  position: fixed; /* 将由脚本动态定位到容器右侧 */
+  background: #cfe9ff;
+  color: #1e3a5f;
+  border: 1px solid #a3c9f7;
+  border-radius: 10px;
+  padding: 12px 8px;
+  cursor: pointer;
+  writing-mode: vertical-rl; /* 竖排文字 */
+  text-orientation: mixed;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: none; /* 初始隐藏，图表显示时再显示 */
+}
+        #viewmoreBtn:hover { background: #b9dbff; }
+
+        /* 音乐长方体（贴靠容器上方） */
+        #musicBar {
+  position: absolute; /* 动态定位到容器上方 */
+  left: 0; top: 0; /* 将由脚本重置 */
+  height: 36px; /* 收起时高度 */
+  background: linear-gradient(180deg, #e6f2ff 0%, #d8ebff 100%);
+  border: 1px solid #a3c9f7;
+  color: #1e3a5f;
+  display: none; /* 随页面显示 */
+  box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+  overflow: hidden;
+  transition: height 0.3s ease, top 0.3s ease, opacity 0.2s ease;
+}
+        #musicBar.expanded { height: 260px; }
+        /* 音乐整体预加载进度条 */
+        #musicPreloadBar { position: absolute; left: 50%; transform: translateX(-50%); bottom: 32px; width: 70%; height: 6px; background: #e5e7eb; border-radius: 999px; overflow: hidden; display: none; }
+        #musicPreloadFill { height: 100%; width: 0%; background: linear-gradient(90deg,#60a5fa,#3b82f6); transition: width .2s ease; }
+        #musicBarHeader {
+  height: 36px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px;
+  cursor: pointer; user-select: none; font-weight: 600;
+}
+        #musicBarTitle { font-size: 14px; }
+        #musicSearchWrap { position: relative; padding: 10px 12px 12px 12px; }
+        /* 右上角只有一条横线的输入框效果 */
+        #musicSearchInput {
+  position: absolute; right: 12px; top: 10px; width: 40%;
+  border: none; border-bottom: 1px solid #1e3a5f; outline: none; background: transparent;
+  font-size: 14px; padding: 4px 2px; color: #1e3a5f;
+}
+        /* 两条虚线分隔 */
+        .dashed-line { height: 1px; border-bottom: 1px dashed #7aa9dc; margin: 46px 0 8px 0; }
+        .dashed-line.two { margin: 8px 0; }
+        #musicResults { max-height: 150px; overflow: auto; padding: 4px 2px; font-size: 13px; color: #24486e; }
+        #musicControls { position: absolute; left: 50%; transform: translateX(-50%); bottom: 6px; width: 70%; display: none; align-items: center; gap: 8px; justify-content: center; }
+        #musicProgress { flex: 1; }
+        .music-row { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; gap: 8px; }
+        .music-title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .music-play { background: transparent; border: none; cursor: pointer; padding: 2px; display: none; }
+        .music-row.active .music-play { display: inline-block; }
+        .progress-circle { 
+          width: 20px; height: 20px; border-radius: 50%; display: inline-block; margin-left: 8px; 
+          position: relative; background: #e5e7eb; border: 2px solid #e5e7eb;
+        }
+        .progress-circle::before {
+          content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+          width: 12px; height: 12px; border-radius: 50%; background: #fff; z-index: 2;
+        }
+        .progress-circle::after {
+          content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-90deg);
+          width: 16px; height: 16px; border-radius: 50%; 
+          background: conic-gradient(#3b82f6 calc(var(--p, 0)*1%), transparent 0);
+          z-index: 1;
+        }
+        .progress-circle.done::after { background: #22c55e; }
+        .progress-circle.done { border-color: #22c55e; }
+        
+        /* 图片预加载进度条 */
+        .image-progress { 
+          position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+          font-size: 11px; color: #6b7280; background: rgba(255,255,255,0.9);
+          padding: 2px 6px; border-radius: 4px; border: 1px solid #d1d5db;
+        }
+        .icon { width: 16px; height: 16px; display: inline-block; vertical-align: middle; }
+       
+    </style>
+</head>
+<body>
+    <!-- 页面加载钢琴风格进度层 -->
+    <div id="pianoLoader" style="position:fixed;inset:0;background:#0f172a;display:flex;align-items:center;justify-content:center;z-index:10000;">
+      <div style="display:flex;gap:4px;">
+        <div class="key" style="width:10px;height:40px;background:#fff;animation:press 1s infinite ease-in-out;animation-delay:0s"></div>
+        <div class="key" style="width:10px;height:40px;background:#fff;animation:press 1s infinite ease-in-out;animation-delay:.1s"></div>
+        <div class="key" style="width:10px;height:40px;background:#fff;animation:press 1s infinite ease-in-out;animation-delay:.2s"></div>
+        <div class="key" style="width:10px;height:40px;background:#fff;animation:press 1s infinite ease-in-out;animation-delay:.3s"></div>
+        <div class="key" style="width:10px;height:40px;background:#fff;animation:press 1s infinite ease-in-out;animation-delay:.4s"></div>
+      </div>
+    </div>
+      <!-- p5.js 容器 - 固定在左上角 -->
+  <div id="p5-container"></div>
+  
+  <!-- 3D饼图容器 -->
+  <div class="chart-container">
+    <canvas id="gradeChart"></canvas>
+    <!-- HTML：按钮 --> 
+    <button id="a_button" disabled>加载中...</button> <!-- 初始禁用，预加载完成后启用 --> 
+    <div id="imageProgress" class="image-progress" style="display: none;">0/0</div> 
+ 
+  
+  </div> 
+
+  
+    <!-- 竖状浅蓝色 viewmore 按钮（切换到图表时显示） -->
+    <button id="viewmoreBtn">viewmore</button>
+
+    <!-- 音乐长方体（动态定位，贴靠容器上方） -->
+        <div id="musicBar">
+      <div id="musicBarHeader">
+        <div id="musicBarTitle">Music</div>
+        <div>▲</div>
+      </div>
+      <div id="musicSearchWrap">
+       <input id="musicSearchInput" placeholder="Search" title="搜索音乐" aria-label="搜索音乐"/>
+        <div class="dashed-line"></div>
+        <div id="musicResults"></div>
+        <div class="dashed-line two"></div>
+        <div id="musicControls">
+          <button id="musicPlayBtn" class="music-play" aria-label="play/pause">
+            <svg class="icon" viewBox="0 0 24 24" id="globalPlayIcon">
+              <polygon points="6,4 20,12 6,20" fill="#15314d"></polygon>
+            </svg>
+            <svg class="icon" viewBox="0 0 i24 24" id="globalPauseIcon" style="display:none">
+              <rect x="6" y="4" width="4" height="16" fill="#15314d"></rect>
+              <rect x="14" y="4" width="4" height="16" fill="#15314d"></rect>
+            </svg>
+          </button>
+          <input id="musicProgress" type="range" min="0" max="100" value="0" aria-label="播放进度" title="拖动调整播放位置"/>
+          <div id="musicPreloadBar"><div id="musicPreloadFill"></div></div>
+        </div>
+      </div>
+    </div>
+  
+    <div id="realtime-clock" style="
+    
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(0,0,0,0.7);
+  padding: 10px 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(68, 59, 116, 0.15);
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+  opacity: 0.6;
+  filter: brightness(2px);
+">
+  <span id="current-time">00:00:00</span>
+</div>
+
+
+    
+
+    <div class="todo-app">
+        <h1>Todo List</h1>
+        <div class="input-area">
+            <input type="text" id="new-task" placeholder="Add a new task...">
+            <button id="add-btn">+</button>
+        </div>
+        <ul id="task-list"></ul>
+    </div>
+    
+    <button id="toggleButton" style=" 
+  
+  
+  position: fixed; /* 固定定位，相对于视口 */ 
+  left: 50%; /* 水平居中 */  
+  bottom: 20px; /* 距离底部20px（可调整） */ 
+  color: #39b398e8; /* 文字不透明 */ 
+  background: transparent; /* 背景透明 */ 
+  border: none; /* 边框透明 */ 
+  padding: 12px 24px; 
+  font-size: 18px; 
+  cursor: pointer; 
+  z-index: 1000; /* 确保在容器上方 */
+   ">999</button>
+
+    <script>
+
+        const style = document.createElement('style'); 
+
+        style.textContent  = `
+
+
+        @font-face {
+
+        font-family: 'JDFXS';
+
+        src: url('09.TTF') format('truetype'); /* 使用正确的根目录路径 */
+
+    }
+
+    .task-text, #new-task { font-family: 'JDFXS', sans-serif; }
+
+`;
+
+
+document.head.appendChild(style); 
+        // 删除重复的内联字体定义，避免冲突
+        // const style = document.createElement('style'); 
+        // style.textContent = ... 
+        // document.head.appendChild(style); 
+
+        // API基础URL
+        const API_BASE = 'https://cfvzflekhbwe.sealoshzh.site/api';
+        
+        // 任务数组初始化（从API加载）
+        let tasks = [];
+
+        // DOM元素
+        const taskInput = document.getElementById('new-task'); 
+        const addButton = document.getElementById('add-btn'); 
+        const taskList = document.getElementById('task-list'); 
+
+        // 初始化渲染（从API加载数据）
+        loadTasksFromAPI();
+
+        // 添加任务
+        addButton.addEventListener('click', addTask);
+        taskInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+
+        // 统一事件委托：处理“详情”按钮点击
+        taskList.addEventListener('click', function(e){
+            const btn = e.target.closest('.detail-btn');
+            if (btn) {
+                const id = btn.getAttribute('data-id');
+                if (id) { openDetailById(id); }
+            }
+        });
+
+        async function addTask() {
+            const taskText = taskInput.value.trim(); 
+            if (taskText) {
+                try {
+                    const response = await fetch(`${API_BASE}/add-todo`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            value: taskText,
+                            isCompleted: false
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        // 添加成功后重新加载任务列表
+                        await loadTasksFromAPI();
+                        taskInput.value = '';
+                        taskInput.focus();
+                    } else {
+                        alert('添加失败: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('添加任务失败:', error);
+                    console.log('网络错误，使用本地存储');
+                    // 网络错误时使用本地存储
+                    const newTask = {
+                        id: 'local_' + Date.now(),
+                        text: taskText,
+                        completed: false
+                    };
+                    tasks.push(newTask);
+                saveTasks();
+                renderTasks();
+                taskInput.value = '';
+                taskInput.focus(); 
+                }
+            }
+        }
+
+        // 从API加载任务列表
+        async function loadTasksFromAPI() {
+            try {
+                const response = await fetch(`${API_BASE}/get-todo`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    tasks = result.data.map(item => ({
+                        id: item.id,
+                        text: item.value,
+                        completed: item.isCompleted
+                    }));
+                    // API成功时同步到本地存储
+                    saveTasks();
+                    renderTasks();
+                } else {
+                    console.error('加载任务失败:', result.message);
+                    console.log('回退到本地存储');
+                    loadTasksFromLocal();
+                }
+            } catch (error) {
+                console.error('网络错误:', error);
+                console.log('网络错误，回退到本地存储');
+                loadTasksFromLocal();
+            }
+        }
+
+        // 渲染任务列表（带动画）
+        function renderTasks() {
+            taskList.innerHTML = '';
+            tasks.forEach((task, index) => {
+                const li = document.createElement('li'); 
+                li.className = 'task-item';
+                if (task.completed) {
+                    li.classList.add('completed'); 
+                }
+                li.innerHTML = `
+                    <input type="checkbox" ${task.completed ? 'checked' : ''}>
+                    <span class="task-text">${task.text}</span> 
+                    <button class="detail-btn" data-id="${task.id}">详情</button>
+                    <button class="delete-btn">✕</button>
+                `;
+                taskList.appendChild(li); 
+
+                // 事件绑定：删除任务
+                li.querySelector('.delete-btn').addEventListener('click', async () => {
+                    li.classList.add('fade-out'); 
+                    setTimeout(async () => {
+                        try {
+                            const response = await fetch(`${API_BASE}/del-todo/${task.id}`, {
+                                method: 'POST'
+                            });
+                            const result = await response.json();
+                            
+                            if (result.success) {
+                                await loadTasksFromAPI(); // 重新加载列表
+                            } else {
+                                alert('删除失败: ' + result.message);
+                                li.classList.remove('fade-out'); // 恢复显示
+                            }
+                        } catch (error) {
+                            console.error('删除任务失败:', error);
+                            console.log('网络错误，使用本地存储删除');
+                            // 网络错误时使用本地存储删除
+                            const taskIndex = tasks.findIndex(t => t.id === task.id);
+                            if (taskIndex !== -1) {
+                                tasks.splice(taskIndex, 1);
+                        saveTasks();
+                        renderTasks();
+                            }
+                        }
+                    }, 300);
+                });
+
+                // 事件绑定：切换任务状态
+                li.querySelector('input').addEventListener('change', async () => {
+                // 事件绑定：详情按钮（保留逐项绑定）
+                const detailBtnEl = li.querySelector('.detail-btn');
+                if (detailBtnEl) {
+                    detailBtnEl.addEventListener('click', () => openDetailById(detailBtnEl.getAttribute('data-id')));
+                }
+                    try {
+                        const response = await fetch(`${API_BASE}/update-todo/${task.id}`, {
+                            method: 'POST'
+                        });
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            task.completed = result.data.isCompleted;
+                            li.classList.toggle('completed', task.completed);
+                            saveTasks(); // 同步到本地存储
+                        } else {
+                            alert('更新失败: ' + result.message);
+                            // 恢复checkbox状态
+                            li.querySelector('input').checked = task.completed;
+                        }
+                    } catch (error) {
+                        console.error('更新任务失败:', error);
+                        console.log('网络错误，使用本地存储更新');
+                        // 网络错误时使用本地存储更新
+                    task.completed = !task.completed; 
+                    li.classList.toggle('completed', task.completed); 
+                    saveTasks();
+                    }
+                });
+            });
+        }
+
+        // 详情数据本地缓存键
+        const DETAIL_KEY_PREFIX = 'todo_detail_';
+
+        function getDetailById(id) {
+            try { return localStorage.getItem(DETAIL_KEY_PREFIX + id) || ''; } catch (_) { return ''; }
+        }
+
+        function setDetailById(id, text) {
+            try { localStorage.setItem(DETAIL_KEY_PREFIX + id, text || ''); } catch (_) {}
+        }
+
+        function openDetailModal(task) {
+            const overlay = document.createElement('div');
+            overlay.className = 'detail-overlay';
+
+            const modal = document.createElement('div');
+            modal.className = 'detail-modal';
+
+            const header = document.createElement('div');
+            header.className = 'detail-header';
+
+            const editBtn = document.createElement('button');
+            editBtn.className = 'detail-edit-btn';
+            editBtn.textContent = '编辑';
+
+            const saveBtn = document.createElement('button');
+            saveBtn.className = 'detail-save-btn';
+            saveBtn.textContent = '✔';
+
+            header.appendChild(editBtn);
+            header.appendChild(saveBtn);
+
+            const content = document.createElement('div');
+            content.className = 'detail-content';
+
+            const textarea = document.createElement('textarea');
+            textarea.className = 'detail-textarea';
+            textarea.value = getDetailById(task.id);
+            textarea.readOnly = true;
+
+            content.appendChild(textarea);
+            modal.appendChild(header);
+            modal.appendChild(content);
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            function closeModal() {
+                overlay.style.animation = 'overlayFade 200ms ease reverse forwards';
+                modal.style.animation = 'modalIn 180ms ease reverse forwards';
+                setTimeout(() => overlay.remove(), 180);
+            }
+
+            editBtn.addEventListener('click', () => {
+                textarea.readOnly = false;
+                textarea.focus();
+            });
+
+            saveBtn.addEventListener('click', () => {
+                setDetailById(task.id, textarea.value);
+                textarea.readOnly = true;
+                closeModal();
+            });
+
+            // 按下 ESC 关闭
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) closeModal();
+            });
+            document.addEventListener('keydown', function escHandler(ev){
+                if (ev.key === 'Escape') { closeModal(); document.removeEventListener('keydown', escHandler); }
+            });
+        }
+
+        function openDetailById(id) {
+            const t = tasks.find(x => x.id === id);
+            if (t) openDetailModal(t);
+        }
+
+        function updateClock() {
+            const now = new Date();
+            // 只提取时分秒并格式化为两位数
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            // 更新显示
+            document.getElementById('current-time').textContent = 
+            `${hours}:${minutes}:${seconds}`;
+        }
+
+        // 初始加载时显示时间
+         updateClock();
+
+         // 每秒更新一次
+         setInterval(updateClock, 1000);
+
+
+
+        // 保存到localStorage（作为网络错误时的回退）
+        function saveTasks() {
+            localStorage.setItem('tasks', JSON.stringify(tasks)); 
+        }
+        
+        // 从localStorage加载（网络错误时的回退）
+        function loadTasksFromLocal() {
+            const localTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks = localTasks;
+            renderTasks();
+        }
+
+        // 预加载图片并显示 
+
+        // 1. 预加载图片（自动探测 9.11~9.99，支持 .jpg/.JPG）
+
+        let preloadedImages = [];
+        let currentImageIndex = 0;
+        let availableImageUrls = [];
+
+        const svgXCode = `
+
+        <svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
+  <defs>
+    <!-- 蓝白渐变定义 -->
+    <linearGradient id="blueWhiteGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4facfe" /> <!-- 浅蓝色 -->
+      <stop offset="100%" stop-color="#00f2fe" /> <!-- 亮蓝色 -->
+    </linearGradient>
+  </defs>
+  
+  <!-- 居中缩小的叉叉 -->
+  <text 
+    x="50" 
+    y="50" 
+    font-size="40" 
+    font-family="Arial, sans-serif" 
+    text-anchor="middle" 
+    dominant-baseline="middle" 
+    fill="url(#blueWhiteGradient)">×
+  </text>
+</svg>
+        
+   
+        
+             `;
+        
+        
+
+            // 你的 SVG 叉号代码（可替换为实际内容）
+
+
+                document.addEventListener('DOMContentLoaded', function() {
+                        const button = document.getElementById('a_button'); 
+                    const progressDiv = document.getElementById('imageProgress');
+                    let finishedCount = 0; let successCount = 0;
+
+                    const candidateNumbers = Array.from({ length: 89 }, (_, i) => (i + 11).toString().padStart(2, '0'));
+                    const candidateUrls = candidateNumbers.flatMap(n => [`9.${n}.jpg`, `9.${n}.JPG`]);
+                    const totalCandidates = candidateUrls.length;
+                    if (totalCandidates === 0) { button.textContent = '加载失败'; return; }
+
+                    progressDiv.style.display = 'block';
+                    progressDiv.textContent = '0/' + totalCandidates;
+
+                    const loadImage = (url) => new Promise((resolve) => {
+                        const img = new Image();
+                        img.onload = () => { preloadedImages.push(img); if (!availableImageUrls.includes(url)) availableImageUrls.push(url); successCount++; resolve(true); };
+                        img.onerror = () => resolve(false);
+                        img.src = url;
+                    });
+
+                    Promise.all(candidateUrls.map(loadImage)).then(results => {
+                        finishedCount = results.length; successCount = results.filter(Boolean).length;
+                        progressDiv.textContent = finishedCount + '/' + totalCandidates;
+                        if (successCount > 0) { button.disabled = false; button.textContent = '点击显示图片'; }
+                        else { console.error(' 图片预加载失败'); button.textContent = '加载失败'; }
+                        setTimeout(() => { progressDiv.style.display = 'none'; }, 1000);
+                    });
+                });
+
+
+                // 2. 点击按钮显示容器（包含 SVG 叉号和图片）
+
+                document.getElementById('a_button').addEventListener('click', function() {
+                    if (!availableImageUrls || availableImageUrls.length === 0) return;
+                    const container = document.createElement('div'); 
+                    container.style.cssText = ` position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.85); z-index: 9999; opacity: 0; transition: opacity 0.3s; `;
+  
+                    const contentWrapper = document.createElement('div'); 
+                    contentWrapper.style.cssText = ` display: flex; align-items: center; gap: 20px; position: relative; `;
+
+                    const closeBtn = document.createElement('div');
+                    closeBtn.innerHTML = svgXCode;
+                    closeBtn.style.cssText = ` position: absolute; top: -40px; right: -40px; width: 32px; height: 32px; cursor: pointer; background: rgba(255,255,255,0.15); border-radius: 50%; padding: 8px; backdrop-filter: blur(3px); `;
+
+                    const img = new Image();
+                    img.src = availableImageUrls[currentImageIndex];
+                    img.style.cssText = ` max-width: 80vw; max-height: 80vh; width: auto; height: auto; border-radius: 16px; object-fit: contain; `;
+                    img.onerror = () => console.error(' 图片加载失败');
+
+                    const createNavButton = (text, disabled) => {
+                        const btn = document.createElement('button');
+                        btn.textContent = text;
+                        btn.style.cssText = ` font-size: 28px; color: #fff; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 8px 14px; cursor: pointer; backdrop-filter: blur(3px); transition: opacity 0.2s; `;
+                        if (disabled) { btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor = 'default'; }
+                        return btn;
+                    };
+                    const prevBtn = createNavButton('<', currentImageIndex === 0);
+                    const nextBtn = createNavButton('>', currentImageIndex === availableImageUrls.length - 1);
+
+                    const navigate = (direction) => {
+                        const newIndex = currentImageIndex + direction;
+                        if (newIndex >= 0 && newIndex < availableImageUrls.length) {
+                            currentImageIndex = newIndex;
+                            img.src = availableImageUrls[currentImageIndex];
+                            prevBtn.disabled = currentImageIndex === 0;
+                            nextBtn.disabled = currentImageIndex === availableImageUrls.length - 1;
+                            [prevBtn, nextBtn].forEach(btn => { btn.style.opacity = btn.disabled ? '0.5' : '1'; btn.style.cursor = btn.disabled ? 'default' : 'pointer'; });
+                        }
+                    };
+                    prevBtn.addEventListener('click', () => navigate(-1));
+                    nextBtn.addEventListener('click', () => navigate(1));
+
+                    const handleKeyDown = (e) => {
+                        switch (e.key) {
+                            case 'ArrowLeft': if (!prevBtn.disabled) navigate(-1); break;
+                            case 'ArrowRight': if (!nextBtn.disabled) navigate(1); break;
+                            case 'Escape': closeViewer(); break;
+                        }
+                    };
+                    document.addEventListener('keydown', handleKeyDown);
+
+                    const closeViewer = () => { container.style.opacity = '0'; document.removeEventListener('keydown', handleKeyDown); setTimeout(() => container.remove(), 300); };
+
+                    contentWrapper.appendChild(closeBtn);
+                    contentWrapper.appendChild(prevBtn);
+                    contentWrapper.appendChild(img); 
+                    contentWrapper.appendChild(nextBtn);
+                    container.appendChild(contentWrapper); 
+                    document.body.appendChild(container); 
+                    setTimeout(() => container.style.opacity = '1', 10);
+                    closeBtn.addEventListener('click', closeViewer);
+                    container.addEventListener('click', (e) => { if (e.target === container) { closeViewer(); } });
+                });
+  
+
+                 const toggleButton = document.getElementById('toggleButton');  
+const todoApp = document.querySelector('.todo-app');  
+const chartContainer = document.querySelector('.chart-container');  
+                // 初始状态：显示Todo，隐藏图表 
+let isTodoVisible = true; 
+chartContainer.style.display  = 'none'; 
+ 
+// 确保容器初始居中（覆盖可能的原有样式） 
+todoApp.style.position  = 'absolute'; 
+todoApp.style.top  = '50%'; 
+todoApp.style.left  = '50%'; 
+todoApp.style.transform  = 'translate(-50%, -50%)'; 
+chartContainer.style.position  = 'absolute'; 
+chartContainer.style.top  = '50%'; 
+chartContainer.style.left  = '50%'; 
+chartContainer.style.transform  = 'translate(-50%, -50%)'; 
+ 
+// 处理 viewmore 按钮与 p5 容器显隐与定位
+const viewmoreBtn = document.getElementById('viewmoreBtn');
+const p5Container = document.getElementById('p5-container');
+const musicBar = document.getElementById('musicBar');
+const musicBarHeader = document.getElementById('musicBarHeader');
+const musicBarTitle = document.getElementById('musicBarTitle');
+const musicSearchInput = document.getElementById('musicSearchInput');
+const musicResults = document.getElementById('musicResults');
+const musicPlayBtn = document.getElementById('musicPlayBtn');
+const musicProgress = document.getElementById('musicProgress');
+let audioEl = null;
+let tracks = [];
+let currentTrackIndex = -1;
+const PLAY_SVG = '<svg class="icon" viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20" fill="#15314d"></polygon></svg>';
+const PAUSE_SVG = '<svg class="icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" fill="#15314d"></rect><rect x="14" y="4" width="4" height="16" fill="#15314d"></rect></svg>';
+let trackBlobs = {}; // src -> blobUrl
+
+function positionViewmore() {
+  const target = (todoApp.style.display !== 'none') ? todoApp : chartContainer;
+  const rect = target.getBoundingClientRect();
+  const btnRect = viewmoreBtn.getBoundingClientRect();
+  // 贴紧容器右侧，垂直居中
+  const left = rect.right + 10; // 右侧间距 10px
+  const top = rect.top + (rect.height - btnRect.height) / 2;
+  viewmoreBtn.style.left = left + 'px';
+  viewmoreBtn.style.top = top + 'px';
+}
+
+function positionMusicBar() {
+  const target = (todoApp.style.display !== 'none') ? todoApp : chartContainer;
+  const rect = target.getBoundingClientRect();
+  const radius = window.getComputedStyle(target).borderTopLeftRadius;
+  musicBar.style.width = rect.width + 'px';
+  musicBar.style.left = rect.left + 'px';
+  const barH = musicBar.classList.contains('expanded') ? musicBar.scrollHeight : 36;
+  // 与容器上方留出 8px 间距，避免遮挡标题
+  musicBar.style.top = (rect.top - barH - 8) + 'px';
+  // 圆角同步左上/右上
+  musicBar.style.borderTopLeftRadius = radius;
+  musicBar.style.borderTopRightRadius = window.getComputedStyle(target).borderTopRightRadius;
+}
+
+// 初始：显示按钮并定位（默认先贴 todolist）
+viewmoreBtn.style.display = 'block';
+setTimeout(positionViewmore, 0);
+// 仅当音乐条可见时再定位
+if (musicBar.style.display !== 'none') { setTimeout(positionMusicBar, 0); }
+
+// 点击 viewmore：切换 p5 显示隐藏
+viewmoreBtn.addEventListener('click', function() {
+  const showing = !(p5Container.style.display === 'none' || p5Container.style.display === '');
+  if (!showing) {
+    p5Container.style.display = 'block';
+    musicBar.style.display = 'block';
+    setTimeout(positionMusicBar, 0);
+  } else {
+    p5Container.style.display = 'none';
+    musicBar.style.display = 'none';
+  }
+});
+
+// 页面加载完成后隐藏钢琴加载层
+window.addEventListener('load', function(){
+  var loader = document.getElementById('pianoLoader');
+  if (loader) { loader.style.transition = 'opacity .3s'; loader.style.opacity = '0'; setTimeout(function(){ loader.remove(); }, 300); }
+});
+
+// 窗口尺寸变化时，重新定位按钮
+window.addEventListener('resize', positionViewmore);
+window.addEventListener('resize', positionMusicBar);
+ 
+// 按钮点击切换逻辑 
+toggleButton.addEventListener('click',  function() { 
+  if (isTodoVisible) { 
+    // 显示图表，隐藏Todo 
+    todoApp.style.display  = 'none'; 
+    chartContainer.style.display  = 'block'; 
+    viewmoreBtn.style.display = 'block';
+    if (musicBar.style.display !== 'none') positionMusicBar();
+  } else { 
+    // 显示Todo，隐藏图表 
+    chartContainer.style.display  = 'none'; 
+    todoApp.style.display  = 'block'; 
+    viewmoreBtn.style.display = 'block';
+    p5Container.style.display = 'none';
+    if (musicBar.style.display !== 'none') positionMusicBar();
+  } 
+  isTodoVisible = !isTodoVisible; 
+  // 根据当前可见页面更新按钮文本
+  toggleButton.textContent = isTodoVisible ? 'page1' : 'page2'; 
+  // 切换后重新定位 viewmore
+  setTimeout(positionViewmore, 0);
+  if (musicBar.style.display !== 'none') setTimeout(positionMusicBar, 0);
+}); 
+
+// 展开/收起音乐条
+musicBarHeader.addEventListener('click', function() {
+  // 切换展开状态
+  const expanded = musicBar.classList.toggle('expanded');
+  const target = (todoApp.style.display !== 'none') ? todoApp : chartContainer;
+  const rect = target.getBoundingClientRect();
+  // 使用目标高度计算，使底边固定在容器上边，向上展开/收起，并与标题留 8px 距离
+  const targetHeight = expanded ? musicBar.scrollHeight : 36;
+  musicBar.style.top = (rect.top - targetHeight - 8) + 'px';
+});
+
+// 简单搜索占位逻辑（本地模拟）
+musicSearchInput.addEventListener('input', function() {
+  const q = musicSearchInput.value.trim();
+  renderMusicList(q);
+});
+
+function discoverMp3InWorkspace() {
+  // 简单策略：使用图片同目录下的固定命名列表；你可在此处补充扫描逻辑或从服务端获取
+  // 在本地环境下无法直接列目录，这里以约定数组为例，可按需添加
+  // 由于前端无权限枚举目录，这里允许通过 window.MP3_LIST 注入后端或预扫描结果
+  // 若未提供则使用约定列表作为回退
+  const known = (window.MP3_LIST && Array.isArray(window.MP3_LIST) ? window.MP3_LIST : ['猜不透 - 丁当.mp3', '50 高一英语听力标准训练（四十二）.mp3']);
+  tracks = known.filter(function(x){ return /\.mp3$/i.test(x); }).map(function(src, i){
+    return { title: src.replace(/\.mp3$/i, ''), src: src };
+  });
+}
+
+function renderMusicList(filterText) {
+  const list = (filterText ? tracks.filter(function(t){ return (t.title.toLowerCase().indexOf(filterText.toLowerCase()) !== -1); }) : tracks);
+  musicResults.innerHTML = list.map(function(t, idx){
+    const globalIndex = tracks.findIndex(function(tt){ return tt.src === t.src; });
+    return '<div class="music-row' + (globalIndex === 0 ? ' active' : '') + '" data-index="' + globalIndex + '">' +
+      '<div class="music-title" style="display: flex; align-items: center;">' + t.title + ' <span class="progress-circle" data-pc-index="' + globalIndex + '"></span></div>' +
+      '<button class="music-play" data-index="' + globalIndex + '" aria-label="play/pause">' + PLAY_SVG + '</button>' +
+    '</div>';
+  }).join('');
+  // 渲染后启动/恢复进度圈显示
+  initProgressCircles();
+}
+
+function initProgressCircles() {
+  Array.prototype.forEach.call(document.querySelectorAll('.progress-circle'), function(pc){
+    pc.style.setProperty('--p', '0');
+  });
+}
+
+function setProgressCircle(index, percent, done) {
+  var pc = document.querySelector('.progress-circle[data-pc-index="' + index + '"]');
+  if (!pc) return;
+  if (done) {
+    pc.classList.add('done');
+    pc.style.removeProperty('--p');
+  } else {
+    pc.classList.remove('done');
+    pc.style.setProperty('--p', String(Math.max(0, Math.min(100, percent))));
+  }
+}
+
+function updateMusicOverallProgress() {
+  var bar = document.getElementById('musicPreloadBar');
+  var fill = document.getElementById('musicPreloadFill');
+  if (!bar || !fill || tracks.length === 0) return;
+  // 统计已完成数量（根据 trackBlobs 是否存在或圆环是否为done）
+  var doneCount = 0;
+  tracks.forEach(function(t){ if (trackBlobs[t.src]) doneCount += 1; });
+  var pct = Math.round((doneCount / tracks.length) * 100);
+  bar.style.display = 'block';
+  fill.style.width = pct + '%';
+  if (pct >= 100) { setTimeout(function(){ bar.style.display = 'none'; }, 1200); }
+}
+
+function preloadTrack(index) {
+  return new Promise(function(resolve, reject){
+    const t = tracks[index];
+    if (!t) { reject(new Error('no track')); return; }
+    if (trackBlobs[t.src]) { setProgressCircle(index, 100, true); resolve(trackBlobs[t.src]); return; }
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', t.src, true);
+    xhr.responseType = 'blob';
+    xhr.onprogress = function(e){
+      if (e.lengthComputable) {
+        const pct = Math.round((e.loaded / e.total) * 100);
+        setProgressCircle(index, pct, false);
+        // 更新整体预加载进度
+        updateMusicOverallProgress();
+      }
+    };
+    xhr.onload = function(){
+      if (xhr.status >= 200 && xhr.status < 300) {
+        const blobUrl = URL.createObjectURL(xhr.response);
+        trackBlobs[t.src] = blobUrl;
+        setProgressCircle(index, 100, true);
+        updateMusicOverallProgress();
+        resolve(blobUrl);
+      } else {
+        reject(new Error('http ' + xhr.status));
+      }
+    };
+    xhr.onerror = function(){ reject(new Error('network')); };
+    xhr.send();
+  });
+}
+
+function ensureAudio() {
+  if (!audioEl) {
+    audioEl = new Audio();
+    audioEl.preload = 'metadata';
+    audioEl.addEventListener('timeupdate', function(){
+      if (!audioEl.duration || isNaN(audioEl.duration)) return;
+      const pct = Math.min(100, Math.max(0, (audioEl.currentTime / audioEl.duration) * 100));
+      musicProgress.value = String(Math.floor(pct));
+    });
+    audioEl.addEventListener('ended', function(){ musicPlayBtn.textContent = '播放'; });
+  }
+}
+
+musicResults.addEventListener('click', function(e){
+  const btn = e.target.closest('.music-play');
+  if (!btn) {
+    const row = e.target.closest('.music-row');
+    if (row) {
+      // 激活该行，显示右侧播放按钮
+      Array.prototype.forEach.call(document.querySelectorAll('.music-row'), function(r){ r.classList.remove('active'); });
+      row.classList.add('active');
+    }
+    return;
+  }
+  const idx = parseInt(btn.getAttribute('data-index'));
+  if (isNaN(idx) || idx < 0 || idx >= tracks.length) return;
+  if (currentTrackIndex === idx && audioEl && !audioEl.paused) {
+    // 正在播放同一首 -> 暂停
+    audioEl.pause();
+    setGlobalPlayState(false);
+    btn.innerHTML = PLAY_SVG;
+  } else {
+    // 播放该首
+    playTrack(idx);
+    // 仅在点击具体歌曲时显示底部控件与进度条
+    musicControls.style.display = 'flex';
+    // 设置全局播放/暂停图标为播放中
+    setGlobalPlayState(true);
+    // 更新该行按钮为暂停图标，其它行重置为播放图标
+    Array.prototype.forEach.call(document.querySelectorAll('.music-play'), function(b){ b.innerHTML = PLAY_SVG; });
+    btn.innerHTML = PAUSE_SVG;
+  }
+});
+
+function playTrack(idx) {
+  ensureAudio();
+  const track = tracks[idx];
+  if (!track) return;
+  
+  // 确保音乐已预加载完成再播放
+  if (trackBlobs[track.src]) {
+    currentTrackIndex = idx;
+    audioEl.src = trackBlobs[track.src];
+    audioEl.play().then(function(){
+      setGlobalPlayState(true);
+      Array.prototype.forEach.call(document.querySelectorAll('.music-play'), function(b){ b.innerHTML = PLAY_SVG; });
+      var rowBtn = document.querySelector('.music-play[data-index="' + idx + '"]');
+      if (rowBtn) rowBtn.innerHTML = PAUSE_SVG;
+    }).catch(function(){ /* 忽略 */ });
+  } else {
+    // 先预加载，完成后自动播放
+    preloadTrack(idx).then(function(blobUrl){
+      if (currentTrackIndex === idx) return; // 如果用户已切换歌曲，不播放
+      currentTrackIndex = idx;
+      audioEl.src = blobUrl;
+      audioEl.play().then(function(){
+        setGlobalPlayState(true);
+        Array.prototype.forEach.call(document.querySelectorAll('.music-play'), function(b){ b.innerHTML = PLAY_SVG; });
+        var rowBtn = document.querySelector('.music-play[data-index="' + idx + '"]');
+        if (rowBtn) rowBtn.innerHTML = PAUSE_SVG;
+      }).catch(function(){ /* 忽略 */ });
+    }).catch(function(){ 
+      // 预加载失败，直接使用原始URL
+      currentTrackIndex = idx;
+      audioEl.src = track.src;
+      audioEl.play().then(function(){
+        setGlobalPlayState(true);
+        Array.prototype.forEach.call(document.querySelectorAll('.music-play'), function(b){ b.innerHTML = PLAY_SVG; });
+        var rowBtn = document.querySelector('.music-play[data-index="' + idx + '"]');
+        if (rowBtn) rowBtn.innerHTML = PAUSE_SVG;
+      }).catch(function(){ /* 忽略 */ });
+    });
+  }
+}
+
+musicPlayBtn.addEventListener('click', function(){
+  ensureAudio();
+  if (!audioEl.src) {
+    if (tracks.length > 0) playTrack(0);
+    return;
+  }
+  if (audioEl.paused) {
+    audioEl.play();
+    setGlobalPlayState(true);
+    var rowBtn = document.querySelector('.music-play[data-index="' + currentTrackIndex + '"]');
+    if (rowBtn) rowBtn.innerHTML = PAUSE_SVG;
+  } else {
+    audioEl.pause();
+    setGlobalPlayState(false);
+    var rowBtn2 = document.querySelector('.music-play[data-index="' + currentTrackIndex + '"]');
+    if (rowBtn2) rowBtn2.innerHTML = PLAY_SVG;
+  }
+});
+
+musicProgress.addEventListener('input', function(){
+  ensureAudio();
+  if (!audioEl.duration || isNaN(audioEl.duration)) return;
+  const pct = parseInt(musicProgress.value || '0');
+  audioEl.currentTime = (pct / 100) * audioEl.duration;
+});
+
+function setGlobalPlayState(isPlaying) {
+  var playIcon = document.getElementById('globalPlayIcon');
+  var pauseIcon = document.getElementById('globalPauseIcon');
+  if (!playIcon || !pauseIcon) return;
+  playIcon.style.display = isPlaying ? 'none' : 'inline';
+  pauseIcon.style.display = isPlaying ? 'inline' : 'none';
+}
+
+        // 初始化歌曲列表
+        discoverMp3InWorkspace();
+        renderMusicList('');
+        
+        // 预加载所有音乐
+        function preloadAllMusic() {
+          tracks.forEach(function(track, index) {
+            preloadTrack(index).catch(function(){ /* 忽略错误 */ });
+          });
+        }
+        
+        // 延迟预加载，避免阻塞页面渲染
+        setTimeout(preloadAllMusic, 1000);
+
+
+        
+
+
+        // ============== 完整保留的p5.js 代码 ==============
+
+        let textToWrite = "唐嘉翎";
+
+        let SEGMENTS = 200;
+
+        let PI = 3.1415926;
+
+        let TWO_PI = PI * 2;
+   
+
+        class Point {
+  
+            constructor(x, y) {
+  
+                this.x = x;
+  
+                this.y = y;
+ 
+            }
+
+        }
+
+
+        function setup() {
+  
+            // 创建画布时指定到p5-container元素中
+  
+            let canvas = createCanvas(300, 300);
+  
+            canvas.parent('p5-container'); 
+  
+
+  
+            centerX = width / 2;
+  
+            centerY = height / 2;
+  
+ 
+            let screenPct = min(height, width) / 1000;
+ 
+            fontSize = screenPct * 150;
+ 
+            INNER_RADIUS = screenPct * 200;
+ 
+            RADIUS_VARIATION = screenPct * 200;
+  
+  
+            textFont("Helvetica");
+ 
+            textSize(fontSize);
+  
+ 
+            // 设置透明背景
+ 
+ 
+            background(0, 0);
+
+        }
+
+
+        function pointForIndex(pct) {
+  
+            const NOISE_SCALE = 1.5;
+ 
+            let angle = pct * TWO_PI;
+  
+            let cosAngle = cos(angle);
+ 
+ 
+  
+            let sinAngle = sin(angle);
+ 
+            let time = frameCount / 100;
+ 
+            let noiseValue = noise(NOISE_SCALE * cosAngle + NOISE_SCALE, 
+  
+            NOISE_SCALE * sinAngle + NOISE_SCALE, 
+   
+            time);
+
+            let radius = INNER_RADIUS + RADIUS_VARIATION * noiseValue;
+  
+            return new Point(radius * cosAngle + centerX, radius * sinAngle + centerY);
+
+  
+        }
+
+
+  
+        function draw() {
+  
+            // 清除画布但保持透明
+  
+            clear();
+  
+  
+            fill(0); // 只保留黑色文字
+ 
+            noStroke();
+  
+ 
+            beginShape();
+ 
+
+            for (let i = 0; i < SEGMENTS; i++) {
+  
+                let p0 = pointForIndex(i / SEGMENTS);
+  
+  
+                vertex(p0.x, p0.y);
+ 
+
+
+            }
+ 
+            endShape(CLOSE);
+
+
+            let pct = atan2(mouseY - centerY, mouseX - centerX) / TWO_PI;
+ 
+            let pixToAngularPct = 1 / ((INNER_RADIUS + RADIUS_VARIATION / 2) * TWO_PI);
+
+
+
+            for (let textChar of textToWrite) {
+   
+                let charWidth = textWidth(textChar);
+  
+                pct += charWidth/2 * pixToAngularPct;
+  
+    
+  
+                let leftP = pointForIndex(pct-0.01);
+   
+                let rightP = pointForIndex(pct+0.01);
+   
+                let angle = atan2(leftP.y - rightP.y, leftP.x - rightP.x) + PI;
+    
+  
+                push();
+ 
+                let point = pointForIndex(pct);
+  
+                translate(point.x, point.y);
+   
+                rotate(angle);
+  
+                translate(-point.x, -point.y);
+  
+                text(textChar, point.x-charWidth/2, point.y);
+ 
+                pop();
+    
+
+                pct += charWidth/2 * pixToAngularPct;
+
+            }
+
+        }
+
+
+
+
+        // ============== p5.js 代码结束 ==============
+
+
+
+        // 3D饼图配置
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+  
+            const ctx = document.getElementById('gradeChart').getContext('2d'); 
+  
+  
+            // 模拟成绩数据
+  
+            const gradeData = {
+   
+                labels: ['语文', '数学', '英语', '政治', '历史', '地理', '生物', '化学'],
+    
+                datasets: [{
+    
+                    data: [102, 86, 88, 76, 82, 79, 91, 84],
+    
+                    backgroundColor: [
+   
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+  
+                    '#9966FF', '#FF9F40', '#8AC249', '#EA5545'
+   
+                ],
+  
+                borderWidth: 1,
+  
+                borderColor: '#fff',
+   
+                hoverBorderWidth: 2,
+  
+ 
+            }]
+  
+        };
+
+  
+        // 创建3D效果的饼图
+ 
+        new Chart(ctx, {
+  
+            type: 'pie',
+   
+            data: gradeData,
+   
+            options: {
+  
+                responsive: true,
+                maintainAspectRatio:false,
+  
+                plugins: {
+   
+    
+                    legend: {
+   
+                        position: 'top',
+   
+                    },
+   
+                    title: {
+  
+                        display: true,
+  
+                        text: '唐嘉翎2025开学考各科成绩分布',
+  
+                        font: {
+  
+                            size: 18
+  
+                        }
+  
+                    },
+  
+                    // 使用datalabels插件显示百分比
+  
+                    datalabels: {
+  
+                        formatter: (value, ctx) => {
+  
+                            const sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+  
+                            const percentage = (value * 100 / sum).toFixed(1) + '%';
+  
+                            return percentage;
+  
+                        },
+  
+                        color: '#fff',
+  
+                        font: {
+  
+                            weight: 'bold'
+   
+                        }
+   
+                    },
+   
+                    // 添加3D阴影效果
+   
+   
+                    shadow: {
+   
+                        enabled: true,
+   
+                        color: 'rgba(0,0,0,0.3)',
+   
+                        blur: 10,
+   
+                        offsetX: 3,
+   
+                        offsetY: 3
+   
+                    }
+   
+                },
+   
+                // 3D效果设置
+   
+                cutout: '60%',
+   
+                rotation: -30,
+   
+                circumference: 250,
+   
+                animation: {
+   
+                    animateScale: true,
+   
+                    animateRotate: true
+
+                }
+   
+            },
+   
+            plugins: [ChartDataLabels]
+ 
+        }
+
+    );
+
+});
+
+</script>
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
