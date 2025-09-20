@@ -3,232 +3,116 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>秋分·静候佳音｜乙巳蛇年七月廿九</title>
+  <title>秋分加载中｜乙巳年七月廿九</title>
   <style>
-    /* 秋分主题全局样式 */
-    :root {
-      --autumn-gold: #d4a76a;
-      --autumn-red: #8c3d1a;
-      --autumn-cream: #f8f3e6;
-    }
+    /* 秋日极简风格 */
     body {
       margin: 0;
-      background: var(--autumn-cream);
+      background: #f8f3e6;
       font-family: "Noto Serif SC", serif;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      color: var(--autumn-red);
-      overflow: hidden;
-      position: relative;
+      color: #5a3921;
     }
- 
-    /* 动态秋叶背景 */
-    .leaf-bg {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      opacity: 0.15;
-      background-image: 
-        radial-gradient(circle at 20% 30%, var(--autumn-gold) 0%, transparent 25%),
-        radial-gradient(circle at 80% 70%, var(--autumn-red) 0%, transparent 25%);
-    }
- 
-    /* 枫叶容器（修复版） */
-    .leaf-container {
-      position: relative;
-      width: 100%;
-      height: 40vh;
-      margin-bottom: 5vh;
-    }
- 
-    /* 高精度枫叶动画 */
-    .maple-leaf {
-      position: absolute;
-      width: 48px;
-      height: 48px;
-      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 100 100"><path d="M50,0 C60,20 85,15 90,30 C95,50 85,60 75,55 C80,75 60,85 50,80 C40,85 20,75 25,55 C15,60 5,50 10,30 C15,15 40,20 50,0 Z" fill="%23d4a76a"/></svg>');
-      background-size: contain;
-      filter: drop-shadow(1px 1px 1px rgba(140,61,26,0.3));
-      opacity: 0;
-      animation: 
-        falling 8s cubic-bezier(0.55,0.1,0.45,0.9) infinite,
-        sway 3s ease-in-out infinite alternate;
-      transform-origin: center;
-      will-change: transform, opacity;
-    }
- 
-    /* 修复后的下落动画 */
-    @keyframes falling {
-      0% { transform: translate(-10vw, -20vh) rotate(0deg); opacity: 0; }
-      15% { opacity: 0.9; transform: translate(0, 0) rotate(90deg); }
-      100% { transform: translate(10vw, 60vh) rotate(180deg); opacity: 0; }
-    }
- 
-    @keyframes sway {
-      0% { transform: rotate(-8deg); }
-      100% { transform: rotate(8deg); }
-    }
- 
-    /* 进度条系统 */
-    .progress-track {
-      width: 75vw;
-      max-width: 500px;
+    
+    /* 真实进度条容器 */
+    .progress-container {
+      width: 80%;
+      max-width: 400px;
       height: 8px;
       background: rgba(140,61,26,0.1);
       border-radius: 4px;
+      margin: 20px 0;
       overflow: hidden;
-      margin: 2vh 0;
     }
- 
+    
     .progress-bar {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, var(--autumn-gold), var(--autumn-red));
-      border-radius: 4px;
-      transition: width 0.5s ease-out;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      background: linear-gradient(90deg, #d4a76a, #8c3d1a);
+      transition: width 0.3s ease;
     }
- 
-    /* 文字提示 */
-    .loading-text {
-      margin-top: 3vh;
-      font-size: 1.2rem;
-      letter-spacing: 2px;
-      text-align: center;
-      max-width: 80vw;
-    }
- 
-    /* 响应式调整 */
-    @media (max-height: 600px) {
-      .leaf-container { height: 30vh; }
+    
+    /* 秋叶装饰（静态） */
+    .leaf-icon {
+      width: 60px;
+      height: 60px;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 100 100"><path d="M50,0 C60,20 85,15 90,30 C95,50 85,60 75,55 C80,75 60,85 50,80 C40,85 20,75 25,55 C15,60 5,50 10,30 C15,15 40,20 50,0 Z" fill="%23d4a76a"/></svg>');
+      margin-bottom: 20px;
+      opacity: 0.8;
     }
   </style>
 </head>
 <body>
-  <div class="leaf-bg"></div>
-  
-  <div class="leaf-container" id="leafContainer"></div>
-  
-  <div class="progress-track">
+  <div class="leaf-icon"></div>
+  <div class="progress-container">
     <div class="progress-bar" id="progressBar"></div>
   </div>
-  
-  <div class="loading-text" id="loadingText">正在为您准备秋日盛宴...</div>
+  <div id="loadingText">正在连接秋日秘境...</div>
  
   <script>
-    // 时令诗词库（农历七月廿九专用）
-    const AUTUMN_TIPS = [
-      "七月流火，九月授kkkkkkkkkkk衣...",
-      "稻花香里说丰年，听取蛙声一片...",
-      "秋风起兮白云飞，草木黄落兮雁南归...",
-      "今日乙巳年七月廿九，宜静候佳音...",
-      "秋分将至，万物静观皆自得..."
-    ];
- 
-    // 枫叶生成系统（修复版）
-    function initLeaves() {
-      const container = document.getElementById('leafContainer'); 
-      const leafCount = Math.floor(window.innerWidth  / 50); // 根据屏幕宽度动态调整数量 
-      
-      for (let i = 0; i < leafCount; i++) {
-        const leaf = document.createElement('div'); 
-        leaf.className  = 'maple-leaf';
-        
-        // 动态定位（确保覆盖全屏）
-        leaf.style.left  = `${Math.random()  * 100}%`;
-        leaf.style.top  = `${-10 - Math.random()  * 10}%`;
-        leaf.style.animationDelay  = `${Math.random()  * 5}s`;
-        leaf.style.setProperty('--rotate-end',  `${Math.random()  * 360}deg`);
-        
-        container.appendChild(leaf); 
-      }
-    }
- 
-    // 精准进度控制系统 
-    function startProgress() {
+    // 真实资源预加载监控 
+    function loadWithRealProgress() {
+      const targetPage = 'index1.html';  // 您指定的预加载页面 
       const progressBar = document.getElementById('progressBar'); 
       const loadingText = document.getElementById('loadingText'); 
-      let progress = 0;
-      let lastUpdate = Date.now(); 
       
-      // 真实资源预加载 
+      // 真实资源列表（需替换为您的实际资源）
       const resources = [
-        'index1'
+        targetPage,
+        'styles/main.css', 
+        'scripts/app.js', 
+        'images/background.jpg' 
       ];
       
-      // 模拟+真实混合加载 
-      const interval = setInterval(() => {
-        const now = Date.now(); 
-        const delta = (now - lastUpdate) / 1000; // 秒数 
-        
-        // 动态增量算法（基于时间差）
-        const increment = Math.min( 
-          0.5 + delta * 2, // 基础增速 
-          100 - progress   // 不超过剩余量 
-        );
-        
-        progress = Math.min(progress  + increment, 100);
-        progressBar.style.width  = `${progress}%`;
-        lastUpdate = now;
-        
-        // 阶段提示更新 
-        if (progress % 20 < 1) {
-          const tipIndex = Math.floor(progress  / 20);
-          loadingText.textContent  = AUTUMN_TIPS[tipIndex] || AUTUMN_TIPS[0];
-        }
-        
-        // 完成处理 
-        if (progress >= 100) {
-          clearInterval(interval);
-          loadingText.textContent  = "秋色已至，请君入席...";
-          setTimeout(() => {
-            window.location.href  = "index1.html?from=preloader"; 
-          }, 800);
-        }
-      }, 300);
+      let loadedCount = 0;
+      const totalCount = resources.length; 
       
-      // 真实资源加载监控 
+      // 遍历加载每个资源 
       resources.forEach(url  => {
-        fetch(url, { method: 'HEAD' })
-          .then(() => console.log(` 预加载成功: ${url}`))
-          .catch(() => console.warn(` 预加载失败: ${url}`));
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET',  url, true);
+        xhr.onprogress  = (e) => {
+          if (e.lengthComputable)  {
+            const percent = Math.round((e.loaded  / e.total)  * 100);
+            updateProgress((loadedCount + percent / 100) / totalCount * 100);
+          }
+        };
+        xhr.onload  = () => {
+          loadedCount++;
+          updateProgress(loadedCount / totalCount * 100);
+          if (loadedCount === totalCount) {
+            setTimeout(() => {
+              window.location.href  = targetPage + '?preloaded=true';
+            }, 500);
+          }
+        };
+        xhr.onerror  = () => {
+          loadedCount++;
+          updateProgress(loadedCount / totalCount * 100);
+        };
+        xhr.send(); 
       });
-    }
- 
-    // 异常处理系统 
-    function handleErrors() {
-      // 动画支持检测 
-      if (!CSS.supports('animation',  'test')) {
-        document.getElementById('leafContainer').innerHTML  = `
-          <div style="text-align:center;color:var(--autumn-red)">
-            <p>秋意静候，请稍安勿躁...</p>
-          </div>
-        `;
+      
+      // 进度更新函数 
+      function updateProgress(percent) {
+        progressBar.style.width  = `${percent}%`;
+        loadingText.textContent  = getLoadingMessage(percent);
       }
       
-      // 网络状态监控 
-      window.addEventListener('offline',  () => {
-        document.getElementById('loadingText').textContent  = "网络连接中断，请检查后重试...";
-      });
-    }
+      // 阶段提示语 
+      function getLoadingMessage(percent) {
+        if (percent < 30) return "正在准备秋日画卷...";
+        if (percent < 70) return "加载金秋色彩...";
+        return "即将带您领略乙巳年秋色...";
+      }
+    } 
  
     // 启动系统 
-    document.addEventListener('DOMContentLoaded',  () => {
-      initLeaves();
-      startProgress();
-      handleErrors();
-      
-      // 时令问候（根据当前时间）
-      const hour = new Date().getHours();
-      if (hour >= 17 || hour < 5) {
-        document.body.style.background  = "#1a1a2e";
-        document.querySelector('.leaf-bg').style.opacity  = "0.08";
-      }
-    });
+    document.addEventListener('DOMContentLoaded',  loadWithRealProgress);
   </script>
 </body>
 </html>
