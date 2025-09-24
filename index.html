@@ -1900,7 +1900,7 @@ function discoverMp3InWorkspace() {
   // 在本地环境下无法直接列目录，这里以约定数组为例，可按需添加
   // 由于前端无权限枚举目录，这里允许通过 window.MP3_LIST 注入后端或预扫描结果
   // 若未提供则使用约定列表作为回退
-  const known = (window.MP3_LIST && Array.isArray(window.MP3_LIST) ? window.MP3_LIST : ['猜不透 - 丁当.mp3', '50 高一英语听力标准训练（四十二）.mp3,Me too.mp3']);
+  const known = (window.MP3_LIST && Array.isArray(window.MP3_LIST) ? window.MP3_LIST : ['猜不透 - 丁当.mp3', '50 高一英语听力标准训练（四十二）.mp3,'Me Too - Meghan Trainor .mp3']);
   tracks = known.filter(function(x){ return /\.mp3$/i.test(x); }).map(function(src, i){
     return { title: src.replace(/\.mp3$/i, ''), src: src };
   });
