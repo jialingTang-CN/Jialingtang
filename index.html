@@ -31,6 +31,7 @@
     <button onclick="downloadAPK()">Download '枫.apk'</button>  
     <button onclick="downloadAPK1()">Download '?.apk'</button>  
     <button onclick="hh111()">设置青春背景'我们的时光'</button>
+    <button onclick="threeScenarios()">show'</button>
     <script> 
         function downloadAPK() { 
             // Create a hidden anchor element to handle the download 
@@ -74,6 +75,39 @@
             document.body.style.backgroundAttachment  = "fixed";
             document.body.style.backgroundColor  = "#f0f0f0"; // 备用背景色
         }
+        function threeScenarios () {
+            const btn = document.getElementById('bgToggleBtn');
+            const slidingImg = document.getElementById('slidingImage');
+
+            btn.addEventListener('click', () => {
+            clickCount = (clickCount + 1) % 3; // 循环0-1-2
+            switch(clickCount) {
+            case 0: // 取消背景
+            document.body.style.backgroundImage = 'none';
+            slidingImg.classList.add('hidden');
+            btn.textContent = '设置青春背景';
+            break;
+
+            case 1: // 设置青春背景
+            document.body.style.backgroundImage = "url('qingchun.jpg')";
+            document.body.style.backgroundSize = "cover";
+            document.body.style.backgroundPosition = "center";
+            slidingImg.classList.add('hidden');
+            btn.textContent = '设置空白背景';
+            break;
+
+            case 2: // 设置空白背景+滑出图片
+            document.body.style.backgroundImage = "url('backgroundless.jpg')";
+            slidingImg.classList.remove('hidden');
+            setTimeout(() => {
+            slidingImg.style.transform = 'translateX(20px)';
+            }, 50);
+            btn.textContent = '取消背景效果';
+            break;
+            }}
+       }
+        let clickCount = 0;  
+      
     </script> 
 </body> 
 </html> 
