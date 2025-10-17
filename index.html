@@ -6,17 +6,26 @@
     <title>jialing t APK-Downloader</title> 
 </head> 
 <style>
-  .corner-img {
-    float: right;
-    margin-right: 12px;
-    margin-bottom: 15px;
+   .header-container {
+    position: relative;
+    height: 100px;
   }
+   .corner-img {
+     position: absolute;
+     top: 10px;
+     left: 10px;
+     width: 70px;
+     height: auto;
+     border-radius: 4px;
+     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+   }
 </style>
 
 <body> 
     <h1>APK File Download</h1>
     <h2>APK Named '可正常运行的,但是功能不完善' File Download</h2>
-    <img class="corner-img" src="11111.png"  alt="">
+    <div class="header-container">
+      <img src="logo.png"  class="corner-img" alt="">
     
     <!-- Create a button that triggers the download when clicked --> 
     <button onclick="downloadAPK()">Download '枫.apk'</button>  
@@ -45,10 +54,10 @@
             
             // Set the href to the path of your APK file 
             // Note: Ensure the file path is correct (e.g., same directory or full URL) 
-            downloadLink.href  = 'm.apk';  
+            downloadLink.href  = 'm1.apk';  
             
             // Set the download attribute with the desired filename (preserves spaces) 
-            downloadLink.download  = 'm.apk';  
+            downloadLink.download  = 'm1.apk';  
             
             // Simulate a click on the hidden link to start download 
             downloadLink.click();  
