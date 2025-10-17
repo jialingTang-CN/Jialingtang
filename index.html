@@ -6,11 +6,12 @@
     <title>jialing t APK-Downloader</title> 
 </head> 
 <body> 
-    <h1>APK File Download</h1> 
+    <h1>APK File Download</h1>
+    <h2>APK Named '可正常运行的,但是功能不完善' File Download</h2>
     
     <!-- Create a button that triggers the download when clicked --> 
     <button onclick="downloadAPK()">Download '枫.apk'</button>  
- 
+    <button onclick="downloadAPK1()">Download '?.apk'</button>  
     <script> 
         function downloadAPK() { 
             // Create a hidden anchor element to handle the download 
@@ -29,6 +30,23 @@
             // Clean up the created element 
             downloadLink.remove();  
         } 
+        function downloadAPK1() { 
+            // Create a hidden anchor element to handle the download 
+            const downloadLink = document.createElement('a');  
+            
+            // Set the href to the path of your APK file 
+            // Note: Ensure the file path is correct (e.g., same directory or full URL) 
+            downloadLink.href  = 'm.apk';  
+            
+            // Set the download attribute with the desired filename (preserves spaces) 
+            downloadLink.download  = 'm.apk';  
+            
+            // Simulate a click on the hidden link to start download 
+            downloadLink.click();  
+            
+            // Clean up the created element 
+            downloadLink.remove();  
+        }
     </script> 
 </body> 
 </html> 
