@@ -19,6 +19,19 @@
      border-radius: 4px;
      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
    }
+    #preview-frame {
+            width: 100%;
+            height: 500px;
+            border: 2px dashed #3498db;
+            border-radius: 6px;
+            margin-top: 20px;
+            background: white;
+        }
+        .notice {
+            color: #e74c3c;
+            font-weight: bold;
+            margin: 10px 0;
+        }
 </style>
 
 <body> 
@@ -26,11 +39,21 @@
     <h2>APK Named '可正常运行的,但是功能不完善' File Download</h2>
       <h3>HTML注入测试器</h3>
   <textarea id="input" rows="5" cols="50" placeholder="输入HTML代码..."></textarea><br>
-  <button onclick="renderHTML()">渲染</button>
-  <div id="output"></div>
-    <div class="header-container">
-      <img src="11111.jpg"  class="corner-img" alt="">
-    
+    <div class="container">
+        <h1>HTML完整渲染工具</h1>
+        <div class="time-info">
+            📅 当前时间：2025年10月19日 星期日（农历乙巳蛇年八月廿八）12:02
+        </div>
+        
+        <textarea id="html-code" placeholder="请在此粘贴完整的HTML代码（包括<!DOCTYPE>、<html>、<head>、<body>等所有标签）"></textarea>
+        
+        <div class="notice">⚠️ 注意：此工具会完全执行您输入的HTML/CSS/JS代码，请确保代码来源可信</div>
+        
+        <button onclick="renderFullPage()">完整渲染HTML</button>
+        
+        <iframe id="preview-frame" sandbox="allow-scripts allow-same-origin"></iframe>
+    </div>
+  
     <!-- Create a button that triggers the download when clicked --> 
     <button onclick="downloadAPK()">Download '枫.apk'</button>  
     <button onclick="downloadAPK1()">Download '?.apk'</button>  
@@ -111,11 +134,39 @@
                     break;
             }
         }
-          function renderHTML() {
-      const input = document.getElementById('input').value; 
-      // 危险操作：直接将用户输入插入DOM
-      document.getElementById('output').innerHTML  = input; 
-    }
+        function renderFullPage() {
+            const code = document.getElementById('html-code').value; 
+            const frame = document.getElementById('preview-frame'); 
+            
+            // 完全清空iframe
+            frame.srcdoc  = '';
+            
+            // 使用setTimeout确保iframe完全重置
+            setTimeout(() => {
+                try {
+                    // 直接写入完整的HTML文档
+                    frame.srcdoc  = code;
+                    
+                    // 添加时间戳标记
+                    const timeStamp = new Date();
+                    console.log(`[${timeStamp.toLocaleString()}]  HTML已渲染`);
+                    
+                } catch (e) {
+                    frame.srcdoc  = `
+                        <!DOCTYPE html>
+                        <html>
+                        <head><title>渲染错误</title></head>
+                        <body style="color:red;padding:20px;">
+                            <h2>渲染错误：</h2>
+                            <pre>${e.message}</pre> 
+                            <p>请检查HTML代码完整性</p>
+                        </body>
+                        </html>
+                    `;
+                }
+            }, 100);
+        }
+          
       
     </script> 
 </body> 
