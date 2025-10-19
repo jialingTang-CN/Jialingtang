@@ -3,7 +3,7 @@
 <head> 
     <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>jialing t APK-Downloader</title> 
+    <title>jialing t? APK-Downloader</title> 
 </head> 
 <style>
    .header-container {
@@ -24,6 +24,10 @@
 <body> 
     <h1>首先先在这里恭喜唐子睿的担回来直播了。-----APK File Download</h1>
     <h2>APK Named '可正常运行的,但是功能不完善' File Download</h2>
+      <h3>HTML注入测试器</h3>
+  <textarea id="input" rows="5" cols="50" placeholder="输入HTML代码..."></textarea><br>
+  <button onclick="renderHTML()">渲染</button>
+  <div id="output"></div>
     <div class="header-container">
       <img src="11111.jpg"  class="corner-img" alt="">
     
@@ -107,6 +111,11 @@
                     break;
             }
         }
+          function renderHTML() {
+      const input = document.getElementById('input').value; 
+      // 危险操作：直接将用户输入插入DOM
+      document.getElementById('output').innerHTML  = input; 
+    }
       
     </script> 
 </body> 
