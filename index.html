@@ -37,6 +37,10 @@
 <body> 
     <h1>首先先在这里恭喜唐子睿的担回来直播了。-----APK File Download</h1>
     <h2>APK Named '可正常运行的,但是功能不完善' File Download</h2>
+    <audio id="rainAudio" loop>
+    <source src="SVID_20251018_210057_1.mp3"  type="audio/mpeg">
+    您的浏览器不支持音频元素
+</audio>
       <h3>HTML注入测试器</h3>
   <textarea id="input" rows="5" cols="50" placeholder="输入HTML代码..."></textarea><br>
     <div class="container">
@@ -134,6 +138,32 @@
                     break;
             }
         }
+            // 音频控制（需用户交互后播放）
+    const audio = document.getElementById('rainAudio'); 
+    let audioEnabled = false;
+    
+    // 点击页面后启用音频
+    document.addEventListener('click',  () => {
+        if (!audioEnabled) {
+            audio.volume  = 0.3; // 设置合适音量
+            audio.play().catch(e  => console.log(" 自动播放被阻止:", e));
+            audioEnabled = true;
+        }
+    });
+    
+    // 现代浏览器要求音频必须在用户交互后播放
+    function enableAudio() {
+        if (!audioEnabled) {
+            audio.volume  = 0.3;
+            audio.play().then(()  => {
+                audioEnabled = true;
+            }).catch(e => {
+                console.log(" 需要用户交互才能播放音频");
+            });
+        }
+    }
+    
+    // 在合适位置调用enableAudio()，比如按钮点击事件
         function renderFullPage() {
             const code = document.getElementById('html-code').value; 
             const frame = document.getElementById('preview-frame'); 
