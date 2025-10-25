@@ -41,6 +41,8 @@
     <source src="SVID_20251018_210057_1.mp3"  type="audio/mpeg">
     您的浏览器不支持音频元素
 </audio>
+    <audio id="audio1" preload="auto"></audio>
+<audio id="audio2" preload="auto"></audio>
       <h3>HTML注入测试器</h3>
   <textarea id="input" rows="5" cols="50" placeholder="输入HTML代码..."></textarea><br>
     <div class="container">
@@ -145,17 +147,50 @@
     
     // 点击页面后启用音频
     document.addEventListener('click',  () => {
-        if (!audioEnabled) {
-            audio.volume  = 0.3; // 设置合适音量
-            audio.play().catch(e  => console.log(" 自动播放被阻止:", e));
-            audioEnabled = true;
-        }
-    });
+        // 音频元素配置 
+    const audio1 = document.getElementById('audio1'); 
+    const audio2 = document.getElementById('audio2'); 
+    let currentAudio = audio1;
+    let nextAudio = audio2;
     
+    // 音频文件（建议使用同一文件的不同段落或相同文件）
+    const audioSrc = 'yus.mp3'; 
+    
+    // 初始化音频 
+    function initAudio() {
+        audio1.src  = audioSrc;
+        audio2.src  = audioSrc;
+        
+        audio1.volume  = 0.3;
+        audio2.volume  = 0.3;
+        
+        // 第一个音频开始播放 
+        audio1.play().catch(e  => console.log(" 需要用户交互"));
+        
+        // 设置音频结束监听 
+        audio1.addEventListener('timeupdate',  checkAudioProgress);
+        audio2.addEventListener('timeupdate',  checkAudioProgress);
+    }
+    
+    // 检查音频进度，实现无缝切换 
+    function checkAudioProgress() {
+        if(this.currentTime  > this.duration  - 0.5) { // 提前0.5秒准备切换 
+            nextAudio.currentTime  = 0;
+            nextAudio.play(); 
+            
+            // 交换当前和下一个音频引用 
+            const temp = currentAudio;
+            currentAudio = nextAudio;
+            nextAudio = temp;
+        }
+    }
+    
+    // 用户交互后初始化 
+    document.addEventListener('click',  initAudio);
     // 现代浏览器要求音频必须在用户交互后播放
     function enableAudio() {
         if (!audioEnabled) {
-            audio.volume  = 0.3;
+            audio.volume  = 0;
             audio.play().then(()  => {
                 audioEnabled = true;
             }).catch(e => {
