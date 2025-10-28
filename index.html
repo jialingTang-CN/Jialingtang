@@ -35,7 +35,11 @@
         }
 </style>
 
-<body>
+<body style="
+      margin:0;
+      position:relative;   /* body 作定位上下文 */
+      min-height:100vh;    /* 至少一屏高 */
+">
 
  
          <!-- ✅这段就是你想保留下来的内联 SVG -->
@@ -82,7 +86,26 @@
 <audio id="audio2" preload="auto"></audio>
       <h3>HTML注入测试器</h3>
   <textarea id="input" rows="5" cols="50" placeholder="输入HTML代码..."></textarea><br>
-    <div class="container">
+    <div class="container"><svg width="231" height="236" xmlns="http://www.w3.org/2000/svg" style="vector-effect: non-scaling-stroke;" stroke="null">
+ <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
+ <defs style="vector-effect: non-scaling-stroke;" stroke="null">
+  <filter style="vector-effect: non-scaling-stroke;" stroke="null" id="svg_7_blur">
+   <feGaussianBlur style="vector-effect: non-scaling-stroke;" stroke="null" in="SourceGraphic" stdDeviation="0"/>
+  </filter>
+ </defs>
+ <g stroke="null">
+  <title style="vector-effect: non-scaling-stroke;" stroke="null">background</title>
+  <rect style="vector-effect: non-scaling-stroke;" stroke="null" x="-1" y="-1" width="233" height="238" id="canvas_background" fill="none"/>
+  <g style="vector-effect: non-scaling-stroke;" stroke="null" id="canvasGrid" width="100%" height="100%" x="0" y="0" overflow="visible" display="none">
+   <rect style="vector-effect: non-scaling-stroke;" stroke="null" id="svg_1" width="100%" height="100%" x="0" y="0" stroke-width="0" fill="url(#gridpattern)"/>
+  </g>
+ </g>
+ <g stroke="null">
+  <title style="vector-effect: non-scaling-stroke;" stroke="null">Layer 1</title>
+  <path stroke="#000" style="vector-effect: non-scaling-stroke;" fill="#EDB6DC" stroke-width="1.5" id="svg_8" d="m157.5,30.95c147,124 -62.16125,6.20373 -66,3c-1.71674,-1.43276 -3.41888,-3.41886 -5,-5c-1.58112,-1.58114 -3.88153,-3.19028 -7,-5c-1.93402,-1.12235 -3.93414,-3.1443 -6,-4c-2.92157,-1.21015 -4.76111,-2.4159 -8,-4c-2.84073,-1.38935 -5.82376,-1.48626 -8,-2c-1.9465,-0.45951 -5,0 -7,0c-3,0 -9.19073,-0.57785 -13,1c-5.38708,2.2314 -12.03857,7.11638 -17,14c-5.2298,7.25597 -6.94504,16.02013 -11,27c-2.95996,8.01489 -3.92987,17.00908 -5,25c-0.93857,7.0085 -1.64276,13.25406 1,19c2.43649,5.2975 5.7464,11.16119 9,16c2.78995,4.14924 5.47232,11.4723 10,16c4.52768,4.52769 8.42825,9.42335 13,15c4.48297,5.46835 9.91586,9.06848 14,14c4.08414,4.93152 13.28418,11.73115 18,17c4.27039,4.77115 12.62042,11.43797 18,17.99998c4.57178,5.57666 11.59735,12.35065 16,17c5.91479,6.24622 7.8313,10.22055 13,14c2.91046,2.12818 5.38507,4.37201 8,8"/>
+  <path stroke="#000" fill="#EDB6DC" stroke-width="1.5" id="svg_7" d="m111.79343,46.73514c-1.25904,2.35435 -0.22053,1.49536 0.82863,0.64791c2.09833,-1.6949 22.2393,-29.23655 24.12794,-30.93306c3.20514,-2.87907 5.80566,-6.67871 10,-8.28571c3.867,-1.48159 7.04132,-2.94892 11,-4.14286c3.03619,-0.91572 8,-2.07143 12,-2.07143c4,0 8,0 12,0c4,0 8.04132,0.87749 12,2.07143c3.03619,0.91571 6.22937,2.41526 10,4.14286c3.2973,1.51072 5.4505,2.53801 8,5.17857c2.5495,2.64055 3.33746,5.49964 5,8.28571c1.487,2.49193 4.513,3.72235 6,6.21429c1.66254,2.78606 3.49347,6.0885 4,9.32143c0.32037,2.04468 0.54047,4.19827 1,6.21429c0.51373,2.25397 1,4.14286 1,6.21429c0,4.14286 0.48627,6.03173 1,8.28571c1.14874,5.04003 -0.81635,11.4667 -4,19.67857c-2.83777,7.31972 -5.79565,14.59439 -9,21.75c-2.82245,6.30286 -7.06024,13.41281 -12,19.67857c-4.0498,5.13689 -7.10626,12.00689 -12,18.64286c-3.43365,4.65609 -9.14386,9.22463 -13,15.53571c-3.1181,5.10318 -7.7428,12.62643 -13,19.67857c-4.77313,6.40281 -8.7428,13.66215 -14,20.71429c-4.77313,6.40281 -8,10.35714 -11,15.53571c-3,5.17855 -6,9.32141 -10,13.46426c-3,3.10714 -4.75531,7.38673 -7,11.39286" filter="url(#svg_7_blur)"/>
+ </g>
+</svg>
         <h1>HTML完整渲染工具</h1>
         <div class="time-info">
             📅 当前时间：2025年10月19日 星期日（农历乙巳蛇年八月廿八）12:02
