@@ -41,8 +41,9 @@
          <!-- ✅这段就是你想保留下来的内联 SVG -->
          <svg class="svg-background"
        
-           z-index:-1;      /* ←压到最底下 */
-           
+           z-index:-1;  
+             inset:0;            z-index:-1;
+    pointer-events:none;
         
 <svg width="1101" height="1212" xmlns="http://www.w3.org/2000/svg"> <!-- 主网格线 -->
  <defs>
@@ -65,7 +66,7 @@
   <rect stroke="null" id="svg_4" fill="url(#grid)" height="1186" width="1038" y="1" x="100"/>
   <path id="svg_5" stroke-dasharray="1,2" stroke-width="0.8" stroke="#9e9e9e" d="m0,25l210,0"/>
   <path id="svg_6" stroke-dasharray="1,2" stroke-width="0.8" stroke="#9e9e9e" d="m25,0l0,297"/>
- </g>
+ </g></svg></svg>
 
 
     
