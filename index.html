@@ -9,8 +9,8 @@
         .vertical-text1 {
             writing-mode: vertical-rl; /* 竖排文字 */
             font-size: 29px; /* 设置字体大小 */
-            width: 20px; /* 宽度设为一个字的宽度 */
-            line-height: 20px; /* 行高与字体大小一致 */
+            width: 1em; /* 宽度设为一个字的宽度 */
+            line-height: 23px; /* 行高与字体大小一致 */
             position: absolute; /* 绝对定位 */
             top: 0; /* 从顶部开始 */
             left: 44%; /* 水平居中 */
@@ -214,6 +214,20 @@
 切换背景
     </button>
     <script> 
+        var msg="not welcome，please，back，hate you,?!, I am a bit not goodddd because of you" 
+var delay=200 
+function scrollTitle() { 
+	window.document.title=msg 
+	msg=msg.substring(1,msg.length)+msg.substring(0,1) 
+	timeID=setTimeout("scrollTitle()",delay)
+}
+var textElement = document.getElementById("vertical-text1");
+
+        // 设置一个3秒后的定时器
+        setTimeout(function() {
+            // 隐藏文本元素
+            textElement.style.display = "none";
+        }, 4000); // 3000毫秒等于3秒
         function downloadAPK() { 
             // Create a hidden anchor element to handle the download 
             const downloadLink = document.createElement('a');  
