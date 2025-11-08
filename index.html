@@ -164,7 +164,7 @@
 
 
 
-    <button onclick="scrollTitle()">ffffff</button>
+    <button onclick="scrollTitle()">ffffff</button><button id="myButton">Click me</button>
     <h1>首先先在这里恭喜唐子睿的担回来直播了。---
         在这里也很开心,很想你。
         -----APK File Download</h1>
@@ -357,7 +357,7 @@ var textElement = document.getElementById("vertical-text1");var textElement = do
     // 用户交互后初始化 
     document.addEventListener('click',  handleClick);
     // 现代浏览器要求音频必须在用户交互后播放
-    
+    document.getElementById('myButton').addEventListener('click', handleClick);
     
     // 在合适位置调用enableAudio()，比如按钮点击事件
         function renderFullPage() {
