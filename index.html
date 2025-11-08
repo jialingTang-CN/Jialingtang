@@ -15,7 +15,9 @@
             top: 0; /* 从顶部开始 */
             left: 44%; /* 水平居中 */
             transform: translateY(-100%); /* 初始位置在屏幕外 */
-            animation: moveDown 5s linear forwards; /* 动画效果 */color:blue;
+            animation: moveDown 5s linear forwards; /* 动画效果 */background: linear-gradient(to right, #0000FF, #800080); /* 从左到右的线性渐变，颜色从蓝色 (#0000FF) 渐变到紫色 (#800080) */
+  -webkit-background-clip: text; /* 将背景颜色限制在文字内 */
+  -webkit-text-fill-color: transparent; 
         }   @keyframes moveDown {
             to {
                 transform: translateY(100vh); /* 从上往下移动 */
