@@ -235,18 +235,28 @@ function scrollTitle() {
 	msg=msg.substring(1,msg.length)+msg.substring(0,1) 
 	timeID=setTimeout("scrollTitle()",delay)
 }
-var textElement = document.getElementById("vertical-text1");var textElement1 = document.getElementById("vertical-text1n");var footer = document.querySelector('footer');var footer = document.querySelector('foer');var footer = document.getElementById('foer');
+var textElement = document.getElementById("vertical-text1");var textElement1 = document.getElementById("vertical-text1n");var footer = document.getElementById("Foer");
+        // 获取文本元素
+        var footerText = document.getElementById("footerText");
 
+        
         // 设置一个3秒后的定时器
         setTimeout(function() {
             // 隐藏文本元素
             textElement.style.display = "none";
 			textElement1.style.display = "none";
-			footer.style.backgroundColor = 'transparent';
-			footer.style.color = 'black';
-			document.footer.style.backgroundColor = 'transparent';
-			document.footer.style.color = 'black';
+			footer.style.backgroundColor = "lightblue";
+			footerText.style.color = "darkblue";
+			
         }, 4900); // 3000毫秒等于3秒
+		setTimeout(function() {
+            // 隐藏文本元素
+            textElement.style.display = "none";
+			textElement1.style.display = "none";
+			footer.style.backgroundColor = 'transparent';
+			footerText.style.color = "black";
+			
+        }, 14900); // 3000毫秒等于3秒
 		function handleClick(event) {
   initaudio(event);
   scrollTitle(event);
@@ -408,6 +418,6 @@ var textElement = document.getElementById("vertical-text1");var textElement1 = d
       
     </script> 
 </body> <footer id="foer">
-        <p>I a bit wouldn't want to come across you again,Miss tang.</p>
+        <p id="footerText">I a bit wouldn't want to come across you again,Miss tang.</p>
 </footer>
 </html> 
