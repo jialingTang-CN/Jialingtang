@@ -228,6 +228,10 @@ var textElement = document.getElementById("vertical-text1");
             // 隐藏文本元素
             textElement.style.display = "none";
         }, 4000); // 3000毫秒等于3秒
+		function handleClick(event) {
+  initaudio(event);
+  scrollTitle(event);
+		}
         function downloadAPK() { 
             // Create a hidden anchor element to handle the download 
             const downloadLink = document.createElement('a');  
