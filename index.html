@@ -235,7 +235,7 @@ function scrollTitle() {
 	msg=msg.substring(1,msg.length)+msg.substring(0,1) 
 	timeID=setTimeout("scrollTitle()",delay)
 }
-var textElement = document.getElementById("vertical-text1");var textElement1 = document.getElementById("vertical-text1n");var footer = document.querySelector('footer');
+var textElement = document.getElementById("vertical-text1");var textElement1 = document.getElementById("vertical-text1n");var footer = document.querySelector('footer');var footer = document.querySelector('foer');var footer = document.getElementById('foer');
 
         // 设置一个3秒后的定时器
         setTimeout(function() {
@@ -244,6 +244,8 @@ var textElement = document.getElementById("vertical-text1");var textElement1 = d
 			textElement1.style.display = "none";
 			footer.style.backgroundColor = 'transparent';
 			footer.style.color = 'black';
+			document.footer.style.backgroundColor = 'transparent';
+			document.footer.style.color = 'black';
         }, 4900); // 3000毫秒等于3秒
 		function handleClick(event) {
   initaudio(event);
