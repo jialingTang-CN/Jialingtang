@@ -235,13 +235,13 @@ function scrollTitle() {
 	msg=msg.substring(1,msg.length)+msg.substring(0,1) 
 	timeID=setTimeout("scrollTitle()",delay)
 }
-var textElement = document.getElementById("vertical-text1");var textElement1 = document.getElementById("vertical-text1n");
+var textElement = document.getElementById("vertical-text1");var textElement1 = document.getElementById("vertical-text1n");var footer = document.querySelector('foer');
 
         // 设置一个3秒后的定时器
         setTimeout(function() {
             // 隐藏文本元素
             textElement.style.display = "none";
-			textElement1.style.display = "none";
+			textElement1.style.display = "none";footer.style.backgroundColor = 'transparent';
         }, 4900); // 3000毫秒等于3秒
 		function handleClick(event) {
   initaudio(event);
